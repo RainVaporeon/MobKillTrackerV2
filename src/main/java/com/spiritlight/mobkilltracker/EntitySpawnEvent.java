@@ -37,19 +37,9 @@ public class EntitySpawnEvent {
             final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
             for(Entity e : worldEntity) {
                 if(e instanceof EntityPlayerSP) continue;
-                if(e instanceof EntityPlayerMP) continue;
-                if(e == null) return;
-                if(e.getEntityData().hasNoTags()) continue;
-                if(e instanceof EntityItem && e.getName().contains("NPC")) continue;
-                NBTTagCompound trimmedNBT = e.serializeNBT();
-                trimmedNBT.removeTag("Age");
-                trimmedNBT.removeTag("Motion");
-                trimmedNBT.removeTag("Pos");
-                trimmedNBT.removeTag("Fire");
-                trimmedNBT.removeTag("FallDistance");
-                trimmedNBT.removeTag("PickupDelay");
-                trimmedNBT.removeTag("OnGround");
-                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT)) return;
+                if(e == null) continue;
+                if(e.serializeNBT().hasNoTags()) continue;
+                if((e instanceof EntityItem && e.getName().contains("NPC"))) continue;
                 scanEntity(e);
             }
             s.off();
@@ -71,6 +61,7 @@ public class EntitySpawnEvent {
         trimmedNBT.removeTag("FallDistance");
         trimmedNBT.removeTag("PickupDelay");
         trimmedNBT.removeTag("OnGround");
+        if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT)) return;
         if(e instanceof EntityItem) {
             final NBTTagCompound nbt = e.serializeNBT();
             final String name = nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
