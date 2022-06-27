@@ -38,8 +38,8 @@ public class EntitySpawnEvent {
             for(Entity e : worldEntity) {
                 if(e instanceof EntityPlayerSP) continue;
                 if(e == null) continue;
-                if(e.serializeNBT().hasNoTags()) continue;
-                if((e instanceof EntityItem && e.getName().contains("NPC"))) continue;
+                if(e.getEntityData().hasNoTags()) continue;
+                if(e instanceof EntityItem && e.getName().contains("NPC")) continue;
                 scanEntity(e);
             }
             s.off();
