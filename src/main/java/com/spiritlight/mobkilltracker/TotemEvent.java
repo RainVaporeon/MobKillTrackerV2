@@ -19,7 +19,7 @@ public class TotemEvent {
         if((message.contains("has placed a totem at") && !message.contains("[")) || Main.test) {
             if(!instanceOccupied) {
                 drops.clear();
-                EntitySpawnEvent.UUIDMap.clear();
+                entityEvent.UUIDMap.clear();
                 mobKills = 0;
                 AnnouncerSpirit.send("Detected mob totem, started recording...");
                 instanceOccupied = true;

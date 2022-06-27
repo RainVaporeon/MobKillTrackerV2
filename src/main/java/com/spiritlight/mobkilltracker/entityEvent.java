@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EntitySpawnEvent {
+public class entityEvent {
     static final Map<UUID, NBTTagCompound> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean STATUS = new AtomicBoolean(false);
 
@@ -37,7 +37,10 @@ public class EntitySpawnEvent {
                 if(e instanceof EntityPlayerSP) continue;
                 if(e == null) continue;
                 if(e.getEntityData().hasNoTags()) continue;
-                if(e instanceof EntityItem && e.getName().contains("NPC")) continue;
+                if(e instanceof EntityItem) {
+                    if (e.getName().equals("tile.item.air")) continue;
+                    if (e.getName().contains("NPC")) continue;
+                }
                 scanEntity(e);
             }
             STATUS.set(false);
