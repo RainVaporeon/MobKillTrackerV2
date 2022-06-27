@@ -3,10 +3,7 @@ package com.spiritlight.mobkilltracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAreaEffectCloud;
-import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
@@ -22,18 +19,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntitySpawnEvent {
     static final Map<UUID, NBTTagCompound> UUIDMap = new ConcurrentHashMap<>();
-    private static final status s = new status(false);
+    private final AtomicBoolean STATUS = new AtomicBoolean(false);
 
     @SubscribeEvent
     public void onEvent(final EntityEvent event) {
-        if(s.check()) return;
+        if(STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null)
             return;
         CompletableFuture.runAsync(() -> {
-            s.on();
+            STATUS.set(true);
             final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
             for(Entity e : worldEntity) {
                 if(e instanceof EntityPlayerSP) continue;
@@ -42,12 +40,12 @@ public class EntitySpawnEvent {
                 if(e instanceof EntityItem && e.getName().contains("NPC")) continue;
                 scanEntity(e);
             }
-            s.off();
+            STATUS.set(false);
         }).exceptionally(e -> {
             AnnouncerSpirit.sendException((Exception) e);
-            s.off();
+            STATUS.set(false);
             return null;
-        }).thenAccept(x -> s.off());
+        }).thenAccept(x -> STATUS.set(false));
     }
 
     private void scanEntity(Entity e) {
