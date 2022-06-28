@@ -8,7 +8,7 @@ public class API {
     // Only fetch once
     public static void fetchItem() {
         System.out.println("Collecting to db...");
-        Main.itemDB.clear();
+        ItemDB.itemDB.clear();
         try {
             JsonParser parser = new JsonParser();
             JsonElement json = parser.parse(HTTP.get("https://api.wynncraft.com/public_api.php?action=itemDB&category=all"));
@@ -44,13 +44,13 @@ public class API {
                         break;
                 }
                 // Item Name : Tier
-                Main.itemDB.put(element.getAsJsonObject().get("name").getAsString(), tier);
+                ItemDB.itemDB.put(element.getAsJsonObject().get("name").getAsString(), tier);
             }
             for(int i=0; i<4; i++) {
                 json = parser.parse(HTTP.get("https://api.wynncraft.com/v2/ingredient/search/tier/"+i));
                 for (JsonElement element : json.getAsJsonObject().getAsJsonArray("data")) {
                     Tier tier = (i == 0 ? Tier.INGREDIENT_0 : i == 1 ? Tier.INGREDIENT_1 : i == 2 ? Tier.INGREDIENT_2 : Tier.INGREDIENT_3);
-                    Main.itemDB.put(element.getAsJsonObject().get("name").getAsString(), tier);
+                    ItemDB.itemDB.put(element.getAsJsonObject().get("name").getAsString(), tier);
                 }
             }
         } catch (Exception e) {

@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class TotemEvent {
-    private boolean instanceOccupied = false;
+    protected static boolean instanceOccupied = false;
     final static DropStatistics drops = new DropStatistics();
     static int mobKills = 0;
     final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -16,7 +16,7 @@ public class TotemEvent {
     @SubscribeEvent
     public void onMessage(ClientChatReceivedEvent chat) {
         final String message = chat.getMessage().getUnformattedText();
-        if((message.contains("has placed a totem at") && !message.contains("[")) || Main.test) {
+        if((message.contains("placed a mob totem") && !message.contains("[")) || Main.test) {
             if(!instanceOccupied) {
                 drops.clear();
                 entityEvent.UUIDMap.clear();
@@ -29,6 +29,9 @@ public class TotemEvent {
                 } else {
                     scheduler.schedule(summary, 300, TimeUnit.SECONDS);
                 }
+            } else {
+                AnnouncerSpirit.send("A mob totem is already present, ignoring this one.");
+                Main.test = false;
             }
         }
     }

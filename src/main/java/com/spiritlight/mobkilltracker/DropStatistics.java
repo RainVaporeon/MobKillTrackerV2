@@ -1,5 +1,7 @@
 package com.spiritlight.mobkilltracker;
 
+import javax.annotation.Nonnull;
+
 public class DropStatistics {
     private int MythicDropped = 0;
     private int FabledDropped = 0;
@@ -52,6 +54,8 @@ public class DropStatistics {
                 T0Ingredients);
     }
 
+    public boolean doAllowUpdates() { return allowUpdates; }
+
     public void setAllowUpdates(boolean bool) {
         allowUpdates = bool;
     }
@@ -100,12 +104,14 @@ public class DropStatistics {
         return T0Ingredients;
     }
 
-    public boolean isAllowUpdates() {
-        return allowUpdates;
-    }
-
-    public boolean addDrop(Tier tier) {
-        if(!allowUpdates) return false;
+    public boolean addDrop(Tier tier) throws IllegalStateException, IllegalArgumentException {
+        if(!allowUpdates) {
+            // Does not allow updates, whether a totem is not in progress or already ended.
+            throw new IllegalStateException("Method is closed.");
+        }
+        if(tier == null) {
+            throw new IllegalArgumentException("Argument may not be null");
+        }
         switch(tier) {
             case INGREDIENT_0:
                 T0Ingredients++;

@@ -29,7 +29,7 @@ public class DebugCommand extends CommandBase {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if(args.length == 0) {
-            AnnouncerSpirit.send("test, log");
+            AnnouncerSpirit.send("test, log, adv");
         }
         switch(args[0].toLowerCase(Locale.ROOT)) {
             case "test":
@@ -41,8 +41,12 @@ public class DebugCommand extends CommandBase {
                 Main.log = !Main.log;
                 AnnouncerSpirit.send("OK: " + Main.log);
                 break;
+            case "adv":
+                Main.advlog = !Main.advlog;
+                AnnouncerSpirit.send("OK: " + Main.advlog);
+                break;
             default:
-                AnnouncerSpirit.send("test, log");
+                AnnouncerSpirit.send("test, log, adv");
                 break;
         }
     }

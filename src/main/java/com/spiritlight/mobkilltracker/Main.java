@@ -14,12 +14,13 @@ import java.util.Map;
 public class Main
 {
     public static final String MODID = "mkt";
-    public static final String NAME = "Example Mod";
+    public static final String NAME = "MobKillTracker v2";
     public static final String VERSION = "1.0";
     // Lists are all Name:Tier
-    public static final Map<String, Tier> itemDB = new HashMap<>();
+
     static boolean test = false;
     static boolean log = false;
+    static boolean advlog = false;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
