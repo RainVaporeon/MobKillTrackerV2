@@ -6,9 +6,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TotemEvent {
-    protected static boolean instanceOccupied = false;
+    protected static AtomicBoolean instanceOccupied = new AtomicBoolean(false);
     final static DropStatistics drops = new DropStatistics();
     static int mobKills = 0;
     final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -17,12 +18,13 @@ public class TotemEvent {
     public void onMessage(ClientChatReceivedEvent chat) {
         final String message = chat.getMessage().getUnformattedText();
         if((message.contains("placed a mob totem") && !message.contains("[")) || Main.test) {
-            if(!instanceOccupied) {
+            if(!instanceOccupied.get()) {
                 drops.clear();
                 entityEvent.UUIDMap.clear();
                 mobKills = 0;
+                drops.setAllowUpdates(true);
                 AnnouncerSpirit.send("Detected mob totem, started recording...");
-                instanceOccupied = true;
+                instanceOccupied.set(true);
                 if(Main.test) {
                     Main.test = false;
                     scheduler.schedule(summary, 30, TimeUnit.SECONDS);
@@ -37,6 +39,7 @@ public class TotemEvent {
     }
 
     private final Runnable summary = () -> {
+        drops.setAllowUpdates(false);
         AnnouncerSpirit.send(
                 "\n" +
                         "§3§l Mob Totem Ended\n" +
@@ -54,6 +57,6 @@ public class TotemEvent {
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
                         "Total drops: Item " + drops.getTotal(1) + ", Ingredients " + drops.getTotal(2)
         );
-        instanceOccupied = false;
+        instanceOccupied.set(false);
     };
 }

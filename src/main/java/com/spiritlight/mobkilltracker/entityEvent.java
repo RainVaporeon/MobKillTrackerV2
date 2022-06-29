@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class entityEvent {
-    static final Map<UUID, NBTTagCompound> UUIDMap = new ConcurrentHashMap<>();
+    static final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean STATUS = new AtomicBoolean(false);
     private final List<UUID> ignoredMobs = new ArrayList<>();
     private final List<Entity> ignoredEntities = new ArrayList<>();
@@ -29,12 +29,16 @@ public class entityEvent {
     public void onEvent(EntityEvent event) {
         if(STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
-        if(TotemEvent.instanceOccupied) return;
+        if(TotemEvent.instanceOccupied.get()) return;
         CompletableFuture.runAsync(() -> {
             STATUS.set(true);
             final List<Entity> entityList = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
             for(Entity e : entityList) {
                 if(e == null) continue;
+                {
+                    final List<Entity> tmp = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
+                    if(tmp.contains(e)) continue;
+                }
                 if(ignoredMobs.contains(e.getUniqueID())) continue;
                 if(ignoredEntities.contains(e)) continue;
                 if(!(e instanceof EntityArmorStand || e instanceof EntityItem)) {
@@ -43,15 +47,16 @@ public class entityEvent {
                 }
                 if(!e.addedToChunk) continue;
                 if(e.ticksExisted < 2) continue;
-                if (e instanceof EntityItem) {
+                boolean isItem = e instanceof EntityItem;
+                if (isItem) {
                     if (e.getName().equals("tile.item.air")) continue;
                     if (e.getName().equals("item.item.emerald")) continue;
                     if (e.getName().contains("NPC")) continue;
                 }
                 final UUID entityUUID;
-                NBTTagCompound trimmedNBT;
+                String mobOrItemName;
                 try {
-                    trimmedNBT  = e.serializeNBT().copy();
+                    mobOrItemName = isItem ? e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name") : (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                     entityUUID = e.getUniqueID();
                 } catch (NullPointerException| ReportedException ex) {
                     System.out.println("Error occurred whilst processing entity " + e.getClass().getName() + ": " + ex.getMessage());
@@ -63,28 +68,18 @@ public class entityEvent {
                     ignoredEntities.add(e);
                     continue; // don't really wanna bother why it's not working rn
                 }
-                if(trimmedNBT.hasNoTags()) continue;
-                if(trimmedNBT.hasKey("NoGravity", 1)) continue; // Mob attacks
-                trimmedNBT.removeTag("Age");
-                trimmedNBT.removeTag("Motion");
-                trimmedNBT.removeTag("Pos");
-                trimmedNBT.removeTag("Fire");
-                trimmedNBT.removeTag("FallDistance");
-                trimmedNBT.removeTag("PickupDelay");
-                trimmedNBT.removeTag("OnGround");
-                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT)) continue;
+                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName)) continue;
                 if(Main.advlog) {
                     AnnouncerSpirit.send("Logging entity " + e.getClass().getName());
                 }
                 if(e instanceof EntityItem) {
+                    final NBTTagCompound nbt = e.serializeNBT();
                     if(Main.advlog) {
                         AnnouncerSpirit.send(new TextComponentString("Processing item entity " + e.getClass().getName()).setStyle(
                                 new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
                         ));
                     }
-                    final NBTTagCompound nbt = e.serializeNBT();
-                    final String name = nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
-                    if(nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").toString().contains("identifications")) continue;
+                if(nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").toString().contains("identifications")) continue;
                     if (Main.log) {
                         AnnouncerSpirit.send(new TextComponentString("Found item of " + e.getName()).setStyle(
                                 new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -93,15 +88,17 @@ public class entityEvent {
                                         e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                     }
                     try {
-                        TotemEvent.drops.addDrop(ItemDB.getTier(name));
+                        TotemEvent.drops.addDrop(ItemDB.getTier(mobOrItemName));
                     } catch (IllegalArgumentException ex) {
-                        System.out.println("Unknown tier for " + name);
+                        System.out.println("Unknown tier for " + mobOrItemName);
                     } catch (IllegalStateException exc) {
                         // no-op
                     }
                 } else {
                     if(Main.advlog) {
-                        AnnouncerSpirit.send("Processing entity " + e.getClass().getName());
+                        AnnouncerSpirit.send(new TextComponentString("Processing entity " + e.getClass().getName()).setStyle(
+                                new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
+                        ));
                     }
                     final String name = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                     if(name.toLowerCase(Locale.ROOT).contains("combat xp")) {
@@ -110,7 +107,7 @@ public class entityEvent {
                         TotemEvent.mobKills++;
                     }
                 }
-                UUIDMap.put(entityUUID, trimmedNBT);
+                UUIDMap.put(entityUUID, mobOrItemName);
             }
             STATUS.set(false);
         }).exceptionally(e -> {
