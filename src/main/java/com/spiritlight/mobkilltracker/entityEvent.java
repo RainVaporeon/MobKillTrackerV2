@@ -29,7 +29,7 @@ public class entityEvent {
     public void onEvent(EntityEvent event) {
         if(STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
-        if(TotemEvent.instanceOccupied.get()) return;
+        if(!TotemEvent.instanceOccupied.get()) return;
         CompletableFuture.runAsync(() -> {
             STATUS.set(true);
             final List<Entity> entityList = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
