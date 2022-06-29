@@ -23,7 +23,6 @@ public class entityEvent {
     static final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean STATUS = new AtomicBoolean(false);
     private final AtomicBoolean ITEMSTATUS = new AtomicBoolean(false);
-    private final List<UUID> ignoredMobs = new ArrayList<>();
 
     @SubscribeEvent
     public void onEntityEvent(EntityEvent event) {
@@ -34,13 +33,9 @@ public class entityEvent {
             STATUS.set(true);
             final List<Entity> entityList = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
             for (Entity e : entityList) {
-                if (ignoredMobs.contains(e.getUniqueID())) continue;
                 if (!(e instanceof EntityArmorStand)) {
-                    ignoredMobs.add(e.getUniqueID());
                     continue;
                 }
-                if (!e.addedToChunk) continue;
-                if (e.ticksExisted < 1) continue;
                 final UUID entityUUID = e.getUniqueID();
                 String mobOrItemName = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                 if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName)) continue;
@@ -80,8 +75,8 @@ public class entityEvent {
                 final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
                 for (Entity e : worldEntity) {
                     if (!(e instanceof EntityItem)) continue;
-                    if (e.isGlowing()) continue;
                     if(e.getName().contains("NPC")) continue;
+                    if(e.serializeNBT().hasKey("NoGravity", 1)) continue;
                     NBTTagCompound trimmedNBT = e.serializeNBT();
                     trimmedNBT.removeTag("Age");
                     trimmedNBT.removeTag("Motion");
