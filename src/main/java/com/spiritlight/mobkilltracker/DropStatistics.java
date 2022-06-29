@@ -102,13 +102,13 @@ public class DropStatistics {
         return T0Ingredients;
     }
 
-    public void addDrop(Tier tier) throws IllegalStateException, IllegalArgumentException {
+    public void addDrop(Tier tier) {
         if(!allowUpdates) {
             // Does not allow updates, whether a totem is not in progress or already ended.
-            throw new IllegalStateException("Method is closed.");
+            return;
         }
         if(tier == null) {
-            throw new IllegalArgumentException("Argument may not be null");
+            return;
         }
         switch(tier) {
             case INGREDIENT_0:
