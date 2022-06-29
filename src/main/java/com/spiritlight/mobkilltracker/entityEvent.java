@@ -22,99 +22,95 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class entityEvent {
     static final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean STATUS = new AtomicBoolean(false);
+    private final AtomicBoolean ITEMSTATUS = new AtomicBoolean(false);
     private final List<UUID> ignoredMobs = new ArrayList<>();
-    private final List<Entity> ignoredEntities = new ArrayList<>();
 
     @SubscribeEvent
-    public void onEvent(EntityEvent event) {
-        if(STATUS.get()) return;
+    public void onEntityEvent(EntityEvent event) {
+        if (STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
-        if(!TotemEvent.instanceOccupied.get()) return;
+        if (!TotemEvent.instanceOccupied.get()) return;
         CompletableFuture.runAsync(() -> {
             STATUS.set(true);
             final List<Entity> entityList = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
-            for(Entity e : entityList) {
-                if(e == null) continue;
-                {
-                    final List<Entity> tmp = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
-                    if(tmp.contains(e)) continue;
-                }
-                if(ignoredMobs.contains(e.getUniqueID())) continue;
-                if(ignoredEntities.contains(e)) continue;
-                if(!(e instanceof EntityArmorStand || e instanceof EntityItem)) {
+            for (Entity e : entityList) {
+                if (ignoredMobs.contains(e.getUniqueID())) continue;
+                if (!(e instanceof EntityArmorStand)) {
                     ignoredMobs.add(e.getUniqueID());
                     continue;
                 }
-                if(!e.addedToChunk) continue;
-                if(e.ticksExisted < 2) continue;
-                boolean isItem = e instanceof EntityItem;
-                if (isItem) {
-                    if (e.getName().equals("tile.item.air")) continue;
-                    if (e.getName().equals("item.item.emerald")) continue;
-                    if (e.getName().contains("NPC")) continue;
-                }
-                final UUID entityUUID;
-                String mobOrItemName;
-                try {
-                    mobOrItemName = isItem ? e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name") : (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
-                    entityUUID = e.getUniqueID();
-                } catch (NullPointerException| ReportedException ex) {
-                    System.out.println("Error occurred whilst processing entity " + e.getClass().getName() + ": " + ex.getMessage());
-                    if(Main.log) {
-                        AnnouncerSpirit.send(new TextComponentString("Caught exception processing " + e.getClass().getName() + ", ignoring").setStyle(
-                                new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString("Stacktrace: \n" + ex.getMessage() + ":" + ex.getClass().getCanonicalName() + "\n" + Arrays.toString(ex.getStackTrace()).replace(",", "\n") + "\nEntity Data:\n" + e)))
-                        ));
-                    }
-                    ignoredEntities.add(e);
-                    continue; // don't really wanna bother why it's not working rn
-                }
+                if (!e.addedToChunk) continue;
+                if (e.ticksExisted < 1) continue;
+                final UUID entityUUID = e.getUniqueID();
+                String mobOrItemName = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                 if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName)) continue;
-                if(Main.advlog) {
-                    AnnouncerSpirit.send("Logging entity " + e.getClass().getName());
+                if (Main.advlog) {
+                    AnnouncerSpirit.send(new TextComponentString("Processing entity " + e.getClass().getName()).setStyle(
+                            new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
+                    ));
                 }
-                if(e instanceof EntityItem) {
-                    final NBTTagCompound nbt = e.serializeNBT();
-                    if(Main.advlog) {
-                        AnnouncerSpirit.send(new TextComponentString("Processing item entity " + e.getClass().getName()).setStyle(
-                                new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
-                        ));
-                    }
-                if(nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").toString().contains("identifications")) continue;
-                    if (Main.log) {
-                        AnnouncerSpirit.send(new TextComponentString("Found item of " + e.getName()).setStyle(
-                                new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                        new TextComponentString(format("Wynncraft Item Name: " + nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name") + "\n\n" + "Item name: " + (e.hasCustomName() ? e.getCustomNameTag() + "(" + e.getName() + ")" : e.getName()) + "\n" + "Item UUID: " + e.getUniqueID() + "\n\n" + nbt + "\n\nClick to track!")))
-                                ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
-                                        e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
-                    }
-                    try {
-                        TotemEvent.drops.addDrop(ItemDB.getTier(mobOrItemName));
-                    } catch (IllegalArgumentException ex) {
-                        System.out.println("Unknown tier for " + mobOrItemName);
-                    } catch (IllegalStateException exc) {
-                        // no-op
-                    }
-                } else {
-                    if(Main.advlog) {
-                        AnnouncerSpirit.send(new TextComponentString("Processing entity " + e.getClass().getName()).setStyle(
-                                new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
-                        ));
-                    }
-                    final String name = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
-                    if(name.toLowerCase(Locale.ROOT).contains("combat xp")) {
-                        if(Main.log)
-                            AnnouncerSpirit.send("Detected mob kill.");
-                        TotemEvent.mobKills++;
-                    }
+                final String name = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
+                if (name.toLowerCase(Locale.ROOT).contains("combat xp")) {
+                    if (Main.log)
+                        AnnouncerSpirit.send("Detected mob kill.");
+                    TotemEvent.mobKills++;
                 }
                 UUIDMap.put(entityUUID, mobOrItemName);
             }
             STATUS.set(false);
         }).exceptionally(e -> {
-            e.printStackTrace();
+            if (!(e instanceof ReportedException)) e.printStackTrace();
+            STATUS.set(false);
             return null;
         }).whenComplete((c, throwable) -> STATUS.set(false)
         );
+    }
+
+    @SubscribeEvent
+    public void itemEvent(final EntityEvent event) {
+        if (!TotemEvent.instanceOccupied.get())
+            return;
+        if (ITEMSTATUS.get())
+            return;
+        if (Minecraft.getMinecraft().world == null)
+            return;
+        try {
+            CompletableFuture.runAsync(() -> {
+                ITEMSTATUS.set(true);
+                final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
+                for (Entity e : worldEntity) {
+                    if (!(e instanceof EntityItem)) continue;
+                    if (e.isGlowing()) continue;
+                    if(e.getName().contains("NPC")) continue;
+                    NBTTagCompound trimmedNBT = e.serializeNBT();
+                    trimmedNBT.removeTag("Age");
+                    trimmedNBT.removeTag("Motion");
+                    trimmedNBT.removeTag("Pos");
+                    trimmedNBT.removeTag("Fire");
+                    trimmedNBT.removeTag("FallDistance");
+                    trimmedNBT.removeTag("PickupDelay");
+                    trimmedNBT.removeTag("OnGround");
+                    if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT.toString()))
+                        continue;
+                    String wItemName = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
+                    if (Main.log) {
+                        AnnouncerSpirit.send(new TextComponentString("Found item of " + e.getName()).setStyle(
+                                new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                        new TextComponentString(format("Wynncraft Item Name:" + wItemName + "\n\n" + "Item name: " + (e.hasCustomName() ? e.getCustomNameTag() + "(" + e.getName() + ")" : e.getName()) + "\n" + "Item UUID: " + e.getUniqueID() + "\n\n" + e.serializeNBT() + "\n\nClick to track!")))
+                                ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
+                                        e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
+                    }
+                    TotemEvent.drops.addDrop(ItemDB.getTier(wItemName));
+                    UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
+                }
+                ITEMSTATUS.set(false);
+            }).exceptionally(e -> {
+                ITEMSTATUS.set(false);
+                if(Main.log) AnnouncerSpirit.sendException((Exception) e);
+                e.printStackTrace();
+                return null;
+            }).thenAccept(x -> ITEMSTATUS.set(false));
+        } catch (NullPointerException ignored) {}
     }
 
     private String format(String s) {

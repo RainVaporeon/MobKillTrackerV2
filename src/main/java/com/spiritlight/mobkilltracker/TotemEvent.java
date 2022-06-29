@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TotemEvent {
     protected static AtomicBoolean instanceOccupied = new AtomicBoolean(false);
-    final static DropStatistics drops = new DropStatistics();
+    protected final static DropStatistics drops = new DropStatistics();
     static int mobKills = 0;
-    final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @SubscribeEvent
     public void onMessage(ClientChatReceivedEvent chat) {
@@ -38,7 +38,13 @@ public class TotemEvent {
         }
     }
 
-    private final Runnable summary = () -> {
+    protected static void terminate() {
+        summary.run();
+        scheduler.shutdown();
+    }
+
+    private static final Runnable summary = () -> {
+        if(!instanceOccupied.get()) return;
         drops.setAllowUpdates(false);
         AnnouncerSpirit.send(
                 "\n" +
@@ -57,6 +63,8 @@ public class TotemEvent {
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
                         "Total drops: Item " + drops.getTotal(1) + ", Ingredients " + drops.getTotal(2)
         );
-        instanceOccupied.set(false);
+        entityEvent.UUIDMap.clear(); // Releasing resources
+        drops.clear();
+        instanceOccupied.set(false); // Call at last line
     };
 }

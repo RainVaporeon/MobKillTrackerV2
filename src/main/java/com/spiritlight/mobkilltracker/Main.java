@@ -29,6 +29,7 @@ public class Main
         ClientCommandHandler.instance.registerCommand(new DebugCommand());
         MinecraftForge.EVENT_BUS.register(new entityEvent());
         MinecraftForge.EVENT_BUS.register(new TotemEvent());
+        MinecraftForge.EVENT_BUS.register(new DisconnectEvent());
     }
 
     @EventHandler
