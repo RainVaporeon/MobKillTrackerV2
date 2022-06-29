@@ -16,6 +16,7 @@ public class TotemEvent {
 
     @SubscribeEvent
     public void onMessage(ClientChatReceivedEvent chat) {
+        if(!Main.enabled) return;
         final String message = chat.getMessage().getUnformattedText();
         if((message.contains("placed a mob totem") && !message.contains("[")) || Main.test) {
             if(!instanceOccupied.get()) {

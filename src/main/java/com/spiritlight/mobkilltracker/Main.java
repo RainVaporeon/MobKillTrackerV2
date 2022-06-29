@@ -21,6 +21,7 @@ public class Main
     static boolean test = false;
     static boolean log = false;
     static boolean advlog = false;
+    static boolean enabled = true;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)

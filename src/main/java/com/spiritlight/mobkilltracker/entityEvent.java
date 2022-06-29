@@ -26,6 +26,7 @@ public class entityEvent {
 
     @SubscribeEvent
     public void onEntityEvent(EntityEvent event) {
+        if(!Main.enabled) return;
         if (STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
         if (!TotemEvent.instanceOccupied.get()) return;
@@ -63,6 +64,7 @@ public class entityEvent {
 
     @SubscribeEvent
     public void itemEvent(final EntityEvent event) {
+        if(!Main.enabled) return;
         if (!TotemEvent.instanceOccupied.get())
             return;
         if (ITEMSTATUS.get())
