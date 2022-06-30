@@ -26,7 +26,7 @@ public class entityEvent {
 
     @SubscribeEvent
     public void onEntityEvent(final EntityEvent event) {
-        if(!Main.enabled) return;
+        if (!Main.enabled) return;
         if (STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
         if (!TotemEvent.instanceOccupied.get()) return;
@@ -40,7 +40,8 @@ public class entityEvent {
                 }
                 final UUID entityUUID = e.getUniqueID();
                 String mobOrItemName = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
-                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName)) continue;
+                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName))
+                    continue;
                 if (Main.advlog) {
                     messenger.send(new TextComponentString("Processing entity " + e.getClass().getName()).setStyle(
                             new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
@@ -65,7 +66,7 @@ public class entityEvent {
 
     @SubscribeEvent
     public void itemEvent(final EntityEvent event) {
-        if(!Main.enabled) return;
+        if (!Main.enabled) return;
         if (!TotemEvent.instanceOccupied.get())
             return;
         if (ITEMSTATUS.get())
@@ -79,10 +80,11 @@ public class entityEvent {
                 final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
                 for (Entity e : worldEntity) {
                     if (!(e instanceof EntityItem)) continue;
-                    if(e.getName().contains("NPC")) continue;
-                    if(e.serializeNBT().hasKey("NoGravity", 1)) continue;
+                    if (e.getName().contains("NPC")) continue;
+                    if (e.serializeNBT().hasKey("NoGravity", 1)) continue;
                     NBTTagCompound trimmedNBT = e.serializeNBT();
-                    if(trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner")) continue; // Cape thingy
+                    if (trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner"))
+                        continue; // Cape thingy
                     trimmedNBT.removeTag("Age");
                     trimmedNBT.removeTag("Motion");
                     trimmedNBT.removeTag("Pos");
@@ -108,20 +110,21 @@ public class entityEvent {
             }).exceptionally(e -> {
                 ITEMSTATUS.set(false);
                 final AnnouncerSpirit messenger = new AnnouncerSpirit();
-                if(Main.log) messenger.sendException((Exception) e);
+                if (Main.log) messenger.sendException((Exception) e);
                 e.printStackTrace();
                 return null;
             }).thenAccept(x -> ITEMSTATUS.set(false));
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException ignored) {
+        }
     }
 
     private String format(String s) {
         return s
                 .replace("{", TextFormatting.AQUA + "{" + TextFormatting.GOLD)
-                .replace("}",TextFormatting.AQUA + "}" + TextFormatting.GOLD)
-                .replace("[",TextFormatting.RESET + "[" + TextFormatting.GOLD)
-                .replace("]",TextFormatting.RESET + "]" + TextFormatting.GOLD)
-                .replace(",",TextFormatting.RESET + "," + TextFormatting.GOLD)
+                .replace("}", TextFormatting.AQUA + "}" + TextFormatting.GOLD)
+                .replace("[", TextFormatting.RESET + "[" + TextFormatting.GOLD)
+                .replace("]", TextFormatting.RESET + "]" + TextFormatting.GOLD)
+                .replace(",", TextFormatting.RESET + "," + TextFormatting.GOLD)
                 .replace(":", TextFormatting.RESET + ":" + TextFormatting.AQUA)
                 .replace("'", TextFormatting.YELLOW + "'" + TextFormatting.RESET)
                 .replace("\"", TextFormatting.GREEN + "\"" + TextFormatting.GOLD);

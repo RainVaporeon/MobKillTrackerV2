@@ -10,27 +10,18 @@ import java.util.Arrays;
 
 public class AnnouncerSpirit {
     public void send(String message) {
-        try {
-            Minecraft.getMinecraft().player.sendMessage(new TextComponentString(Main.PREFIX + message));
-        } catch (NullPointerException ignored) {
-            System.out.println("Caught NullPointerException whilst attempting to send a message, assuming player does not yet exist.");
-        }
+        if (Minecraft.getMinecraft().player == null) return;
+        Minecraft.getMinecraft().player.sendMessage(new TextComponentString(Main.PREFIX + message));
     }
 
     public void send(TextComponentString message) {
-        try {
-            Minecraft.getMinecraft().player.sendMessage(message);
-        } catch (NullPointerException ignored) {
-            System.out.println("Caught NullPointerException whilst attempting to send a message, assuming player does not yet exist.");
-        }
+        if (Minecraft.getMinecraft().player == null) return;
+        Minecraft.getMinecraft().player.sendMessage(message);
     }
 
     public void send(ITextComponent message) {
-        try {
-            Minecraft.getMinecraft().player.sendMessage(message);
-        } catch (NullPointerException ignored) {
-            System.out.println("Caught NullPointerException whilst attempting to send a message, assuming player does not yet exist.");
-        }
+        if (Minecraft.getMinecraft().player == null) return;
+        Minecraft.getMinecraft().player.sendMessage(message);
     }
 
     public void sendException(Exception e, String message, boolean printStackTrace) {
@@ -40,7 +31,7 @@ public class AnnouncerSpirit {
         TextComponentString s = new TextComponentString(e.getClass().getCanonicalName() + ": " + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()).replace(",", ",\n").replace("[", "").replace("]", ""));
         style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, s));
         send(t);
-        if(printStackTrace)
+        if (printStackTrace)
             e.printStackTrace();
     }
 

@@ -29,7 +29,7 @@ public class TotemCommand extends CommandBase {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         final AnnouncerSpirit messenger = new AnnouncerSpirit();
-        if(args.length==0) {
+        if (args.length == 0) {
             messenger.send("Invalid syntax. Available commands:\n" +
                     "/" + getName() + " start [duration] - Records mob area for x seconds, default 30.\n" +
                     "/" + getName() + " stop - Terminates current scan and dump the summary\n" +
@@ -38,13 +38,13 @@ public class TotemCommand extends CommandBase {
                     "/" + getName() + " toggle - Toggles mod function");
             return;
         }
-        switch(args[0].toLowerCase(Locale.ROOT)) {
+        switch (args[0].toLowerCase(Locale.ROOT)) {
             case "toggle":
                 Main.enabled = !Main.enabled;
                 messenger.send("OK, mod active is now: " + Main.enabled);
                 break;
             case "start":
-                if(args.length == 1) {
+                if (args.length == 1) {
                     TotemEvent.start();
                 } else try {
                     TotemEvent.start(Integer.parseInt(args[1]));
@@ -53,7 +53,7 @@ public class TotemCommand extends CommandBase {
                 }
                 break;
             case "stop":
-                if(TotemEvent.instanceOccupied.get()) {
+                if (TotemEvent.instanceOccupied.get()) {
                     messenger.send("Terminating this session...");
                     TotemEvent.terminate();
                 } else {
@@ -66,12 +66,12 @@ public class TotemCommand extends CommandBase {
                 messenger.send("Extra details will " + (Main.logAdvanced ? "now" : "no longer") + " be logged in summary.");
                 break;
             case "time":
-                if(args.length == 1) {
+                if (args.length == 1) {
                     messenger.send("Current hotkey time is " + Main.def_duration + " seconds.");
                     return;
                 } else try {
                     int time = Integer.parseInt(args[1]);
-                    if(time < 1) {
+                    if (time < 1) {
                         messenger.send("Timer is too short, must be at least 1 second.");
                         return;
                     } else {
