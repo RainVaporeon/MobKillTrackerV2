@@ -26,3 +26,8 @@ Commands are as follows:
 ## Builds
 
 aaaa IntellIJ IDEA with Java 8u211
+
+## Known Issues
+
+- Serious performance issues during scan period.
+- IndexOOB error may occur.

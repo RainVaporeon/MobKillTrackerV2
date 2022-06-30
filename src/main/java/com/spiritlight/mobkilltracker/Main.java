@@ -29,6 +29,7 @@ public class Main
     {
         API.fetchItem();
         ClientCommandHandler.instance.registerCommand(new DebugCommand());
+        ClientCommandHandler.instance.registerCommand(new TotemCommand());
         MinecraftForge.EVENT_BUS.register(new entityEvent());
         MinecraftForge.EVENT_BUS.register(new TotemEvent());
         MinecraftForge.EVENT_BUS.register(new DisconnectEvent());
