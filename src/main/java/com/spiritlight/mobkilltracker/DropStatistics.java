@@ -149,7 +149,7 @@ public class DropStatistics {
         }
     }
 
-    public void removeDrop(Tier tier) {
+    public void removeDrop(Tier tier, int quantity) {
         if(!allowUpdates) {
             // Does not allow updates, whether a totem is not in progress or already ended.
             return;
@@ -160,37 +160,37 @@ public class DropStatistics {
         // Not sure if arranging like this makes things faster, but this basically sorts by literal rarity.
         switch(tier) {
             case INGREDIENT_0:
-                T0Ingredients--;
+                T0Ingredients-=quantity;
                 break;
             case NORMAL:
-                NormalDropped--;
+                NormalDropped-=quantity;
                 break;
             case INGREDIENT_1:
-                T1Ingredients--;
+                T1Ingredients-=quantity;
                 break;
             case UNIQUE:
-                UniqueDropped--;
+                UniqueDropped-=quantity;
                 break;
             case SET:
-                SetDropped--;
+                SetDropped-=quantity;
                 break;
             case RARE:
-                RareDropped--;
+                RareDropped-=quantity;
                 break;
             case LEGENDARY:
-                LegendaryDropped--;
+                LegendaryDropped-=quantity;
                 break;
             case INGREDIENT_2:
-                T2Ingredients--;
+                T2Ingredients-=quantity;
                 break;
             case FABLED:
-                FabledDropped--;
+                FabledDropped-=quantity;
                 break;
             case INGREDIENT_3:
-                T3Ingredients--;
+                T3Ingredients-=quantity;
                 break;
             case MYTHIC:
-                MythicDropped--;
+                MythicDropped-=quantity;
                 break;
             default:
         }

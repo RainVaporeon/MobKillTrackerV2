@@ -1,23 +1,28 @@
 package com.spiritlight.mobkilltracker;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class TossEvent {
     @SubscribeEvent
-    public void onToss(ItemTossEvent event) {
+    public void onToss(EntityEvent event) {
         if (!Main.enabled) return;
         if (!TotemEvent.instanceOccupied.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
-        final EntityItem e = event.getEntityItem();
+        if(!(event.getEntity() instanceof EntityItem)) return;
         if (TotemEvent.drops.doAllowUpdates()) {
+            final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
+            final EntityItem e = (EntityItem) event.getEntity();
+            if(!(e.posY - 1.31999999284744 == playerSP.posY)) return;
             final AnnouncerSpirit messenger = new AnnouncerSpirit();
             final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
             if (Main.log) {
@@ -27,7 +32,7 @@ public class TossEvent {
                         ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
                                 e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
             }
-            TotemEvent.drops.removeDrop(ItemDB.getTierAnyMatch(name));
+            TotemEvent.drops.removeDrop(ItemDB.getTier(name), 2); // Init inclusion. + ext. drop
         }
     }
 
