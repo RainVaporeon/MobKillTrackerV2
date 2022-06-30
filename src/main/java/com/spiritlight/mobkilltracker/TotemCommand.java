@@ -32,10 +32,16 @@ public class TotemCommand extends CommandBase {
             AnnouncerSpirit.send("Invalid syntax. Available commands:\n" +
                     "/" + getName() + " start [duration] - Records mob area for x seconds, default 30.\n" +
                     "/" + getName() + " stop - Terminates current scan and dump the summary\n" +
-                    "/" + getName() + " time [duration] - Sets default keybind duration.");
+                    "/" + getName() + " time [duration] - Sets default keybind duration.\n" +
+                    "/" + getName() + " advanced - Toggles advanced recording mode\n" +
+                    "/" + getName() + " toggle - Toggles mod function");
             return;
         }
         switch(args[0].toLowerCase(Locale.ROOT)) {
+            case "toggle":
+                Main.enabled = !Main.enabled;
+                AnnouncerSpirit.send("OK, mod active is now: " + Main.enabled);
+                break;
             case "start":
                 if(args.length == 1) {
                     TotemEvent.start();
