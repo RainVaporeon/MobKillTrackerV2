@@ -59,11 +59,14 @@ public class TotemEvent {
     private static final Runnable summary = () -> {
         if(!instanceOccupied.get()) return;
         drops.setAllowUpdates(false);
+        final int totalDrops = drops.getTotal(0);
+        final int itemDrops = drops.getTotal(1);
+        final int ingDrops = drops.getTotal(2);
         AnnouncerSpirit.send(
                 "\n" +
                         "§3§l Mob Totem Ended\n" +
                         "§rTotal Mobs Killed: §c" + mobKills + "\n" +
-                        "§rTotal Items Dropped: §a" + drops.getTotal(0) + "\n" +
+                        "§rTotal Items Dropped: §a" + totalDrops + "\n" +
                         "\n" +
                         "§6§l Item Summary: \n" +
                         "§rIngredient Drops: §b[✫✫✫] §rx" + drops.getT3Ingredients() + " §d[✫✫§8✫§d] §rx" + drops.getT2Ingredients() + " §e[✫§8✫✫§e] §rx" + drops.getT1Ingredients() + " §7[§8✫✫✫§7] §rx" + drops.getT0Ingredients() + "\n" +
@@ -74,10 +77,10 @@ public class TotemEvent {
                         "§aSet §rDrops: " + drops.getSetDropped() + "\n" +
                         "§eUnique §rDrops: " + drops.getUniqueDropped() + "\n" +
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
-                        "Total drops: Item " + drops.getTotal(1) + ", Ingredients " + drops.getTotal(2) +
+                        "Total drops: Item " + itemDrops + ", Ingredients " + ingDrops +
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
-                                "§rItem Rate: " + mobKills / drops.getTotal(1) + " §7(Mobs/item)" + "\n" +
-                                "§rIngredient Rate: " + mobKills / drops.getTotal(2) + " §7(Mobs/Ingredient)" : "")
+                                "§rItem Rate: " + mobKills / (itemDrops == 0 ? 1 : itemDrops) + " §7(Mobs/item)" + "\n" +
+                                "§rIngredient Rate: " + mobKills / (ingDrops == 0 ? 1 : ingDrops) + " §7(Mobs/Ingredient)" : "")
         );
         entityEvent.UUIDMap.clear(); // Releasing resources
         drops.clear();
