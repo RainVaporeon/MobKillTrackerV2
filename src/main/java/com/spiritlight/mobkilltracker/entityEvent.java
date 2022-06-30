@@ -82,6 +82,7 @@ public class entityEvent {
                     if(e.getName().contains("NPC")) continue;
                     if(e.serializeNBT().hasKey("NoGravity", 1)) continue;
                     NBTTagCompound trimmedNBT = e.serializeNBT();
+                    if(trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner")) continue; // Cape thingy
                     trimmedNBT.removeTag("Age");
                     trimmedNBT.removeTag("Motion");
                     trimmedNBT.removeTag("Pos");
