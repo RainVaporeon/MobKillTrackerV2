@@ -23,6 +23,8 @@ public class entityEvent {
     static final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean STATUS = new AtomicBoolean(false);
     private final AtomicBoolean ITEMSTATUS = new AtomicBoolean(false);
+    protected static final AtomicBoolean antiDupeCheck_Entity = new AtomicBoolean(true);
+    protected static final AtomicBoolean antiDupeCheck_Item = new AtomicBoolean(true);
 
     @SubscribeEvent
     public void onEntityEvent(final EntityEvent event) {
@@ -51,10 +53,13 @@ public class entityEvent {
                 if (name.toLowerCase(Locale.ROOT).contains("combat xp")) {
                     if (Main.log)
                         messenger.send("Detected mob kill.");
-                    TotemEvent.mobKills++;
+                    if(!antiDupeCheck_Entity.get()) {
+                        TotemEvent.mobKills++;
+                    }
                 }
                 UUIDMap.put(entityUUID, mobOrItemName);
             }
+            antiDupeCheck_Entity.set(false);
             STATUS.set(false);
         }).exceptionally(e -> {
             if (!(e instanceof ReportedException)) e.printStackTrace();
@@ -102,10 +107,12 @@ public class entityEvent {
                                 ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
                                         e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                     }
-
-                    TotemEvent.drops.addDrop(ItemDB.getTier(wItemName));
+                    if(!antiDupeCheck_Item.get()) {
+                        TotemEvent.drops.addDrop(ItemDB.getTier(wItemName));
+                    }
                     UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
                 }
+                antiDupeCheck_Item.set(false);
                 ITEMSTATUS.set(false);
             }).exceptionally(e -> {
                 ITEMSTATUS.set(false);
