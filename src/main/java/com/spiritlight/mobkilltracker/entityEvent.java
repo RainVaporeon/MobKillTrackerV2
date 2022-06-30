@@ -97,6 +97,7 @@ public class entityEvent {
                                 ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
                                         e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                     }
+
                     TotemEvent.drops.addDrop(ItemDB.getTier(wItemName));
                     UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
                 }
