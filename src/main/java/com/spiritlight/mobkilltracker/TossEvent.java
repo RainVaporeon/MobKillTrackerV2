@@ -26,7 +26,6 @@ public class TossEvent {
                                 new TextComponentString(format("Wynncraft Item Name:" + name + "\n\n" + "Item name: " + (e.hasCustomName() ? e.getCustomNameTag() + "(" + e.getName() + ")" : e.getName()) + "\n" + "Item UUID: " + e.getUniqueID() + "\n\n" + e.serializeNBT() + "\n\nClick to track!")))
                         ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
                                 e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
-
             }
             TotemEvent.drops.removeDrop(ItemDB.getTierAnyMatch(name));
         }
