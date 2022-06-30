@@ -75,15 +75,15 @@ public class TotemCommand extends CommandBase {
                         return;
                     } else {
                         Main.def_duration = time;
+                        AnnouncerSpirit.send("Set default hotkey time to " + time + " seconds.");
                         ConfigSpirit.save();
                     }
                 } catch (NumberFormatException ex) {
                     AnnouncerSpirit.send("Failed to parse the duration input.");
                 }
+                break;
             default:
-                AnnouncerSpirit.send("Invalid syntax. Available commands:\n" +
-                        "/" + getName() + " start [duration] - Records mob area for x seconds, default 30.\n" +
-                        "/" + getName() + " stop - Terminates current scan and dump the summary\n");
+                AnnouncerSpirit.send("Invalid syntax. Try /mkt");
         }
     }
 }

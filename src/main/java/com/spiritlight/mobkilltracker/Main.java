@@ -7,6 +7,8 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
+import java.io.IOException;
+
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main
@@ -27,12 +29,18 @@ public class Main
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        try {
+            ConfigSpirit.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         API.fetchItem();
         ClientCommandHandler.instance.registerCommand(new DebugCommand());
         ClientCommandHandler.instance.registerCommand(new TotemCommand());
         MinecraftForge.EVENT_BUS.register(new entityEvent());
         MinecraftForge.EVENT_BUS.register(new TotemEvent());
         MinecraftForge.EVENT_BUS.register(new DisconnectEvent());
+        MinecraftForge.EVENT_BUS.register(new KeyBindings());
         KeyBindings.register();
     }
 
