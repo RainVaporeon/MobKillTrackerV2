@@ -21,7 +21,7 @@ public class KeyBindings {
     @SubscribeEvent
     public void onKeyPress(InputEvent.KeyInputEvent e) {
         if(keyBindings[0].isPressed()) {
-
+            TotemEvent.start(Main.def_duration);
         }
     }
 
