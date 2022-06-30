@@ -146,7 +146,6 @@ public class DropStatistics {
                 MythicDropped++;
                 break;
             default:
-                return;
         }
     }
 
@@ -194,7 +193,6 @@ public class DropStatistics {
                 MythicDropped--;
                 break;
             default:
-                return;
         }
     }
 }

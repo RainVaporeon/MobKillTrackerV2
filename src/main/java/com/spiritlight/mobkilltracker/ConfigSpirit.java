@@ -1,6 +1,5 @@
 package com.spiritlight.mobkilltracker;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
@@ -9,8 +8,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 public class ConfigSpirit {
     private static boolean antiLoop = false;

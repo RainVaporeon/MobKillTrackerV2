@@ -40,6 +40,7 @@ public class Main
         MinecraftForge.EVENT_BUS.register(new entityEvent());
         MinecraftForge.EVENT_BUS.register(new TotemEvent());
         MinecraftForge.EVENT_BUS.register(new DisconnectEvent());
+        MinecraftForge.EVENT_BUS.register(new TossEvent());
         MinecraftForge.EVENT_BUS.register(new KeyBindings());
         KeyBindings.register();
     }

@@ -31,38 +31,39 @@ public class DebugCommand extends CommandBase {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+        final AnnouncerSpirit messenger = new AnnouncerSpirit();
         if(args.length == 0) {
-            AnnouncerSpirit.send("test, log, adv, end, toggle, recollect");
+            messenger.send("test, log, adv, end, toggle, recollect");
             return;
         }
         switch(args[0].toLowerCase(Locale.ROOT)) {
             case "test":
-            AnnouncerSpirit.send("Starting test.");
+            messenger.send("Starting test.");
             Main.test = true;
-            AnnouncerSpirit.send("");
+            messenger.send("");
             break;
             case "log":
                 Main.log = !Main.log;
-                AnnouncerSpirit.send("OK: " + Main.log);
+                messenger.send("OK: " + Main.log);
                 break;
             case "adv":
                 Main.advlog = !Main.advlog;
-                AnnouncerSpirit.send("OK: " + Main.advlog);
+                messenger.send("OK: " + Main.advlog);
                 break;
             case "end":
                 TotemEvent.terminate();
-                AnnouncerSpirit.send("OK, terminated.");
+                messenger.send("OK, terminated.");
                 break;
             case "toggle":
                 Main.enabled = !Main.enabled;
-                AnnouncerSpirit.send("OK, enabled status is now " + Main.enabled);
+                messenger.send("OK, enabled status is now " + Main.enabled);
                 break;
             case "recollect":
-                AnnouncerSpirit.send("Collecting item data from API...");
-                CompletableFuture.runAsync(API::fetchItem).thenAccept(v -> AnnouncerSpirit.send("Fetched from API."));
+                messenger.send("Collecting item data from API...");
+                CompletableFuture.runAsync(API::fetchItem).thenAccept(v -> new AnnouncerSpirit().send("Fetched from API."));
                 break;
             default:
-                AnnouncerSpirit.send("test, log, adv");
+                messenger.send("test, log, adv");
                 break;
         }
     }

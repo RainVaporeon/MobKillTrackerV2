@@ -28,8 +28,9 @@ public class TotemCommand extends CommandBase {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+        final AnnouncerSpirit messenger = new AnnouncerSpirit();
         if(args.length==0) {
-            AnnouncerSpirit.send("Invalid syntax. Available commands:\n" +
+            messenger.send("Invalid syntax. Available commands:\n" +
                     "/" + getName() + " start [duration] - Records mob area for x seconds, default 30.\n" +
                     "/" + getName() + " stop - Terminates current scan and dump the summary\n" +
                     "/" + getName() + " time [duration] - Sets default keybind duration.\n" +
@@ -40,7 +41,7 @@ public class TotemCommand extends CommandBase {
         switch(args[0].toLowerCase(Locale.ROOT)) {
             case "toggle":
                 Main.enabled = !Main.enabled;
-                AnnouncerSpirit.send("OK, mod active is now: " + Main.enabled);
+                messenger.send("OK, mod active is now: " + Main.enabled);
                 break;
             case "start":
                 if(args.length == 1) {
@@ -48,42 +49,42 @@ public class TotemCommand extends CommandBase {
                 } else try {
                     TotemEvent.start(Integer.parseInt(args[1]));
                 } catch (NumberFormatException ex) {
-                    AnnouncerSpirit.send("Failed to parse the duration input.");
+                    messenger.send("Failed to parse the duration input.");
                 }
                 break;
             case "stop":
                 if(TotemEvent.instanceOccupied.get()) {
-                    AnnouncerSpirit.send("Terminating this session...");
+                    messenger.send("Terminating this session...");
                     TotemEvent.terminate();
                 } else {
-                    AnnouncerSpirit.send("There are no ongoing session.");
+                    messenger.send("There are no ongoing session.");
                 }
                 break;
             case "advanced":
                 Main.logAdvanced = !Main.logAdvanced;
-                AnnouncerSpirit.send("Dumping detailed summary: " + Main.logAdvanced);
-                AnnouncerSpirit.send("Extra details will " + (Main.logAdvanced ? "now" : "no longer") + " be logged in summary.");
+                messenger.send("Dumping detailed summary: " + Main.logAdvanced);
+                messenger.send("Extra details will " + (Main.logAdvanced ? "now" : "no longer") + " be logged in summary.");
                 break;
             case "time":
                 if(args.length == 1) {
-                    AnnouncerSpirit.send("Current hotkey time is " + Main.def_duration + " seconds.");
+                    messenger.send("Current hotkey time is " + Main.def_duration + " seconds.");
                     return;
                 } else try {
                     int time = Integer.parseInt(args[1]);
                     if(time < 1) {
-                        AnnouncerSpirit.send("Timer is too short, must be at least 1 second.");
+                        messenger.send("Timer is too short, must be at least 1 second.");
                         return;
                     } else {
                         Main.def_duration = time;
-                        AnnouncerSpirit.send("Set default hotkey time to " + time + " seconds.");
+                        messenger.send("Set default hotkey time to " + time + " seconds.");
                         ConfigSpirit.save();
                     }
                 } catch (NumberFormatException ex) {
-                    AnnouncerSpirit.send("Failed to parse the duration input.");
+                    messenger.send("Failed to parse the duration input.");
                 }
                 break;
             default:
-                AnnouncerSpirit.send("Invalid syntax. Try /mkt");
+                messenger.send("Invalid syntax. Try /mkt");
         }
     }
 }

@@ -18,9 +18,10 @@ public class TossEvent {
         if(Minecraft.getMinecraft().world == null) return;
         final EntityItem e = event.getEntityItem();
         if(TotemEvent.drops.doAllowUpdates()) {
+            final AnnouncerSpirit messenger = new AnnouncerSpirit();
             final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
             if(Main.log) {
-                AnnouncerSpirit.send(new TextComponentString("Found tossed item of " + e.getName()).setStyle(
+                messenger.send(new TextComponentString("Found tossed item of " + e.getName()).setStyle(
                         new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                 new TextComponentString(format("Wynncraft Item Name:" + name + "\n\n" + "Item name: " + (e.hasCustomName() ? e.getCustomNameTag() + "(" + e.getName() + ")" : e.getName()) + "\n" + "Item UUID: " + e.getUniqueID() + "\n\n" + e.serializeNBT() + "\n\nClick to track!")))
                         ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +

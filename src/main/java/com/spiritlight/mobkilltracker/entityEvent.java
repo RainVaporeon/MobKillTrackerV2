@@ -33,6 +33,7 @@ public class entityEvent {
         CompletableFuture.runAsync(() -> {
             STATUS.set(true);
             final List<Entity> entityList = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
+            final AnnouncerSpirit messenger = new AnnouncerSpirit();
             for (Entity e : entityList) {
                 if (!(e instanceof EntityArmorStand)) {
                     continue;
@@ -41,14 +42,14 @@ public class entityEvent {
                 String mobOrItemName = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                 if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName)) continue;
                 if (Main.advlog) {
-                    AnnouncerSpirit.send(new TextComponentString("Processing entity " + e.getClass().getName()).setStyle(
+                    messenger.send(new TextComponentString("Processing entity " + e.getClass().getName()).setStyle(
                             new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
                     ));
                 }
                 final String name = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                 if (name.toLowerCase(Locale.ROOT).contains("combat xp")) {
                     if (Main.log)
-                        AnnouncerSpirit.send("Detected mob kill.");
+                        messenger.send("Detected mob kill.");
                     TotemEvent.mobKills++;
                 }
                 UUIDMap.put(entityUUID, mobOrItemName);
@@ -73,6 +74,7 @@ public class entityEvent {
             return;
         try {
             CompletableFuture.runAsync(() -> {
+                final AnnouncerSpirit messenger = new AnnouncerSpirit();
                 ITEMSTATUS.set(true);
                 final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
                 for (Entity e : worldEntity) {
@@ -91,7 +93,7 @@ public class entityEvent {
                         continue;
                     String wItemName = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
                     if (Main.log) {
-                        AnnouncerSpirit.send(new TextComponentString("Found item of " + e.getName()).setStyle(
+                        messenger.send(new TextComponentString("Found item of " + e.getName()).setStyle(
                                 new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                         new TextComponentString(format("Wynncraft Item Name:" + wItemName + "\n\n" + "Item name: " + (e.hasCustomName() ? e.getCustomNameTag() + "(" + e.getName() + ")" : e.getName()) + "\n" + "Item UUID: " + e.getUniqueID() + "\n\n" + e.serializeNBT() + "\n\nClick to track!")))
                                 ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
@@ -104,7 +106,8 @@ public class entityEvent {
                 ITEMSTATUS.set(false);
             }).exceptionally(e -> {
                 ITEMSTATUS.set(false);
-                if(Main.log) AnnouncerSpirit.sendException((Exception) e);
+                final AnnouncerSpirit messenger = new AnnouncerSpirit();
+                if(Main.log) messenger.sendException((Exception) e);
                 e.printStackTrace();
                 return null;
             }).thenAccept(x -> ITEMSTATUS.set(false));

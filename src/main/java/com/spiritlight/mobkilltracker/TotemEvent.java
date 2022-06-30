@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TotemEvent {
-    protected static AtomicBoolean instanceOccupied = new AtomicBoolean(false);
+    protected static final AtomicBoolean instanceOccupied = new AtomicBoolean(false);
     protected final static DropStatistics drops = new DropStatistics();
     static int mobKills = 0;
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -27,23 +27,25 @@ public class TotemEvent {
                     start(300);
                 }
             } else {
-                AnnouncerSpirit.send("A mob totem is already present, ignoring this one.");
+                final AnnouncerSpirit messenger = new AnnouncerSpirit();
+                messenger.send("A mob totem is already present, ignoring this one.");
                 Main.test = false;
             }
         }
     }
 
     protected static void start(int duration) {
+        final AnnouncerSpirit messenger = new AnnouncerSpirit();
         if(!instanceOccupied.get()) {
             drops.clear();
             entityEvent.UUIDMap.clear();
             mobKills = 0;
             drops.setAllowUpdates(true);
-            AnnouncerSpirit.send("Detected mob totem, started recording...");
+            messenger.send("Detected mob totem, started recording...");
             instanceOccupied.set(true);
             scheduler.schedule(summary, duration, TimeUnit.SECONDS);
         } else {
-            AnnouncerSpirit.send("An instance already exists.");
+            messenger.send("An instance already exists.");
         }
     }
 
@@ -57,12 +59,13 @@ public class TotemEvent {
     }
 
     private static final Runnable summary = () -> {
+        final AnnouncerSpirit messenger = new AnnouncerSpirit();
         if(!instanceOccupied.get()) return;
         drops.setAllowUpdates(false);
         final int totalDrops = drops.getTotal(0);
         final int itemDrops = drops.getTotal(1);
         final int ingDrops = drops.getTotal(2);
-        AnnouncerSpirit.send(
+        messenger.send(
                 "\n" +
                         "§3§l Mob Totem Ended\n" +
                         "§rTotal Mobs Killed: §c" + mobKills + "\n" +

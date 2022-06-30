@@ -17,7 +17,8 @@ public class HTTP {
                 return EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
             }
         } catch (IOException e) {
-            AnnouncerSpirit.sendException(e);
+            final AnnouncerSpirit messenger = new AnnouncerSpirit();
+            messenger.sendException(e);
             return "";
         }
     }

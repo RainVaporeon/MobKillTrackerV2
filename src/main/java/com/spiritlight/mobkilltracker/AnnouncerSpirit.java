@@ -9,7 +9,7 @@ import net.minecraft.util.text.event.HoverEvent;
 import java.util.Arrays;
 
 public class AnnouncerSpirit {
-    public static void send(String message) {
+    public void send(String message) {
         try {
             Minecraft.getMinecraft().player.sendMessage(new TextComponentString(Main.PREFIX + message));
         } catch (NullPointerException ignored) {
@@ -17,7 +17,7 @@ public class AnnouncerSpirit {
         }
     }
 
-    public static void send(TextComponentString message) {
+    public void send(TextComponentString message) {
         try {
             Minecraft.getMinecraft().player.sendMessage(message);
         } catch (NullPointerException ignored) {
@@ -25,7 +25,7 @@ public class AnnouncerSpirit {
         }
     }
 
-    public static void send(ITextComponent message) {
+    public void send(ITextComponent message) {
         try {
             Minecraft.getMinecraft().player.sendMessage(message);
         } catch (NullPointerException ignored) {
@@ -33,7 +33,7 @@ public class AnnouncerSpirit {
         }
     }
 
-    public static void sendException(Exception e, String message, boolean printStackTrace) {
+    public void sendException(Exception e, String message, boolean printStackTrace) {
         Style style;
         TextComponentString t = new TextComponentString(message.replace("$err", e.getMessage()).replace("$errType", e.getClass().getCanonicalName()));
         style = t.getStyle();
@@ -44,7 +44,7 @@ public class AnnouncerSpirit {
             e.printStackTrace();
     }
 
-    public static void sendException(Exception e) {
+    public void sendException(Exception e) {
         sendException(e, "$errType: $err caught whilst performing an action (Hover for details)", true);
     }
 }
