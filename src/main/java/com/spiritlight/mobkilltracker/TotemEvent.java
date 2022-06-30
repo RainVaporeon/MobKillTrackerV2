@@ -74,7 +74,10 @@ public class TotemEvent {
                         "§aSet §rDrops: " + drops.getSetDropped() + "\n" +
                         "§eUnique §rDrops: " + drops.getUniqueDropped() + "\n" +
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
-                        "Total drops: Item " + drops.getTotal(1) + ", Ingredients " + drops.getTotal(2)
+                        "Total drops: Item " + drops.getTotal(1) + ", Ingredients " + drops.getTotal(2) +
+                        (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
+                                "§rItem Rate: " + mobKills / drops.getTotal(1) + " §7(Mobs/item)" + "\n" +
+                                "§rIngredient Rate: " + mobKills / drops.getTotal(2) + " §7(Mobs/Ingredient)" : "")
         );
         entityEvent.UUIDMap.clear(); // Releasing resources
         drops.clear();

@@ -5,7 +5,11 @@ Tracks totem stats for mythic farms
 Everything's automated, timer starts when a totem placement is detected; stops when exactly 5 minutes has passed (due to totem expiration message will not always appear)
 
 ## Commands
-Commands are all debug-only, if you would like to toggle the mod, try `/mkt-debug toggle`.
+Normal command is /mkt. Here are the available commands:
+- start [time]: Starts logging for a specified amount of time, default 30s.
+- stop: Terminates current logging and dump summary
+- advanced: Shows detailed info (Item/ingredient rates)
+- time: Shows/sets hotkey timer (Default M for triggering)
 
 ## Debug commands
 Command is always /mkt-debug (or /mktd for short)

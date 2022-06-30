@@ -53,6 +53,11 @@ public class TotemCommand extends CommandBase {
                     AnnouncerSpirit.send("There are no ongoing session.");
                 }
                 break;
+            case "advanced":
+                Main.logAdvanced = !Main.logAdvanced;
+                AnnouncerSpirit.send("Dumping detailed summary: " + Main.logAdvanced);
+                AnnouncerSpirit.send("Extra details will " + (Main.logAdvanced ? "now" : "no longer") + " be logged in summary.");
+                break;
             case "time":
                 if(args.length == 1) {
                     AnnouncerSpirit.send("Current hotkey time is " + Main.def_duration + " seconds.");

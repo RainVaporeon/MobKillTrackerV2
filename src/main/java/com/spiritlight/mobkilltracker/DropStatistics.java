@@ -110,6 +110,7 @@ public class DropStatistics {
         if(tier == null) {
             return;
         }
+        // Not sure if arranging like this makes things faster, but this basically sorts by literal rarity.
         switch(tier) {
             case INGREDIENT_0:
                 T0Ingredients++;
@@ -123,11 +124,11 @@ public class DropStatistics {
             case UNIQUE:
                 UniqueDropped++;
                 break;
-            case RARE:
-                RareDropped++;
-                break;
             case SET:
                 SetDropped++;
+                break;
+            case RARE:
+                RareDropped++;
                 break;
             case LEGENDARY:
                 LegendaryDropped++;
@@ -144,6 +145,8 @@ public class DropStatistics {
             case MYTHIC:
                 MythicDropped++;
                 break;
+            default:
+                return;
         }
     }
 }

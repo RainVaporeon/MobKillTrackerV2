@@ -25,7 +25,7 @@ public class entityEvent {
     private final AtomicBoolean ITEMSTATUS = new AtomicBoolean(false);
 
     @SubscribeEvent
-    public void onEntityEvent(EntityEvent event) {
+    public void onEntityEvent(final EntityEvent event) {
         if(!Main.enabled) return;
         if (STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
