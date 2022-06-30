@@ -7,8 +7,6 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main
@@ -22,6 +20,8 @@ public class Main
     static boolean log = false;
     static boolean advlog = false;
     static boolean enabled = true;
+    static int def_duration = 30;
+    static final String PREFIX = "§2[§aMKT §ev2§2] §a";
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -31,6 +31,7 @@ public class Main
         MinecraftForge.EVENT_BUS.register(new entityEvent());
         MinecraftForge.EVENT_BUS.register(new TotemEvent());
         MinecraftForge.EVENT_BUS.register(new DisconnectEvent());
+        KeyBindings.register();
     }
 
     @EventHandler

@@ -2,8 +2,6 @@ package com.spiritlight.mobkilltracker;
 
 import com.google.gson.*;
 
-import java.util.*;
-
 public class API {
     // Only fetch once
     public static void fetchItem() {

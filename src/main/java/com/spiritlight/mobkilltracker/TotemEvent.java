@@ -20,23 +20,35 @@ public class TotemEvent {
         final String message = chat.getMessage().getUnformattedText();
         if((message.contains("placed a mob totem") && !message.contains("[")) || Main.test) {
             if(!instanceOccupied.get()) {
-                drops.clear();
-                entityEvent.UUIDMap.clear();
-                mobKills = 0;
-                drops.setAllowUpdates(true);
-                AnnouncerSpirit.send("Detected mob totem, started recording...");
-                instanceOccupied.set(true);
                 if(Main.test) {
                     Main.test = false;
-                    scheduler.schedule(summary, 30, TimeUnit.SECONDS);
+                    start(30);
                 } else {
-                    scheduler.schedule(summary, 300, TimeUnit.SECONDS);
+                    start(300);
                 }
             } else {
                 AnnouncerSpirit.send("A mob totem is already present, ignoring this one.");
                 Main.test = false;
             }
         }
+    }
+
+    protected static void start(int duration) {
+        if(!instanceOccupied.get()) {
+            drops.clear();
+            entityEvent.UUIDMap.clear();
+            mobKills = 0;
+            drops.setAllowUpdates(true);
+            AnnouncerSpirit.send("Detected mob totem, started recording...");
+            instanceOccupied.set(true);
+            scheduler.schedule(summary, duration, TimeUnit.SECONDS);
+        } else {
+            AnnouncerSpirit.send("An instance already exists.");
+        }
+    }
+
+    protected static void start() {
+        start(30);
     }
 
     protected static void terminate() {

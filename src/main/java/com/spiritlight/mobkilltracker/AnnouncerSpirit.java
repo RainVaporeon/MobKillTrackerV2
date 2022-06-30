@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class AnnouncerSpirit {
     public static void send(String message) {
         try {
-            Minecraft.getMinecraft().player.sendMessage(new TextComponentString("§2[§aMKT §ev2§2] §a" + message));
+            Minecraft.getMinecraft().player.sendMessage(new TextComponentString(Main.PREFIX + message));
         } catch (NullPointerException ignored) {
             System.out.println("Caught NullPointerException whilst attempting to send a message, assuming player does not yet exist.");
         }
@@ -35,9 +35,9 @@ public class AnnouncerSpirit {
 
     public static void sendException(Exception e, String message, boolean printStackTrace) {
         Style style;
-        TextComponentString t = new TextComponentString(message.replaceAll("\\$err", e.getMessage()).replaceAll("\\$errType", e.getClass().getCanonicalName()));
+        TextComponentString t = new TextComponentString(message.replace("$err", e.getMessage()).replace("$errType", e.getClass().getCanonicalName()));
         style = t.getStyle();
-        TextComponentString s = new TextComponentString(e.getClass().getCanonicalName() + ": " + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()).replaceAll("(,)", ",\n").replaceAll("\\[", "").replaceAll("]", ""));
+        TextComponentString s = new TextComponentString(e.getClass().getCanonicalName() + ": " + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()).replace(",", ",\n").replace("[", "").replace("]", ""));
         style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, s));
         send(t);
         if(printStackTrace)
