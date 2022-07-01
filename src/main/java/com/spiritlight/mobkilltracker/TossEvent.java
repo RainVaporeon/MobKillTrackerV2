@@ -57,7 +57,7 @@ public class TossEvent {
             final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
             if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(name)) continue;
             int wItemQuantity = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
-            TotemEvent.drops.removeDrop(ItemDB.getTier(name), wItemQuantity); // Init inclusion. + ext. drop
+            TotemEvent.drops.removeDrop(ItemDB.getTier(name), wItemQuantity+1); // Init inclusion. + ext. drop
             if (Main.log) {
                 messenger.send(new TextComponentString("Found tossed item of " + e.getName()).setStyle(
                         new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
