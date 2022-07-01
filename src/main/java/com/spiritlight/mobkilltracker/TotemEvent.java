@@ -43,8 +43,6 @@ public class TotemEvent {
             drops.setAllowUpdates(true);
             messenger.send("Detected mob totem, started recording...");
             instanceOccupied.set(true);
-            entityEvent.antiDupeCheck_Item.set(true);
-            entityEvent.antiDupeCheck_Entity.set(true);
             scheduler.schedule(summary, duration, TimeUnit.SECONDS);
         } else {
             messenger.send("An instance already exists.");
