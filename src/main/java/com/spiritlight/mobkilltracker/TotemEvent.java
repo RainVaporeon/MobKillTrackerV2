@@ -3,16 +3,14 @@ package com.spiritlight.mobkilltracker;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TotemEvent {
     protected static final AtomicBoolean instanceOccupied = new AtomicBoolean(false);
     protected final static DropStatistics drops = new DropStatistics();
     static int mobKills = 0;
-    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @SubscribeEvent
     public void onMessage(ClientChatReceivedEvent chat) {
@@ -34,6 +32,10 @@ public class TotemEvent {
         }
     }
 
+    /**
+     * Starts a new totem timer. If the provided scheduler is not available, create a new one instead.
+     * @param duration The length of the timer.
+     */
     protected static void start(int duration) {
         final AnnouncerSpirit messenger = new AnnouncerSpirit();
         if(!instanceOccupied.get()) {
@@ -45,20 +47,33 @@ public class TotemEvent {
             entityEvent.antiDupeI.set(true);
             messenger.send("Detected mob totem, started recording...");
             instanceOccupied.set(true);
-            scheduler.schedule(summary, duration, TimeUnit.SECONDS);
+            try {
+                if(scheduler.isTerminated()) {
+                    scheduler = Executors.newSingleThreadScheduledExecutor();
+                } else {
+                    scheduler.schedule(summary, duration, TimeUnit.SECONDS);
+                }
+            } catch (RejectedExecutionException ex) {
+                new AnnouncerSpirit().send("Error: The responsible thread is not available right now. Please try again later.");
+                instanceOccupied.set(false);
+            }
         } else {
             messenger.send("An instance already exists.");
         }
+
     }
 
     protected static void start() {
         start(30);
     }
 
+
+    /**
+     * Dumps the current summary and terminates thread
+     */
     protected static void terminate() {
         summary.run();
         scheduler.shutdownNow();
-
     }
 
     private static final Runnable summary = () -> {
