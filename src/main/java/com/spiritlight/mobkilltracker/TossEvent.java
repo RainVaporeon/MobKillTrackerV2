@@ -34,6 +34,7 @@ public class TossEvent {
         if (!(event.getEntity() instanceof EntityItem)) return;
         if (!TotemEvent.drops.doAllowUpdates()) return;
         if (processToss.get()) return;
+
         CompletableFuture.runAsync(() -> {
             processToss.set(true);
             final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());

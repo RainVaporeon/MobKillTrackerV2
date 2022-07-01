@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ReportedException;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -20,27 +21,29 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class entityEvent {
     static final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
-    private final AtomicBoolean entityOccupied = new AtomicBoolean(false);
-    private final AtomicBoolean itemOccupied = new AtomicBoolean(false);
-    protected static final AtomicBoolean firstScanE = new AtomicBoolean(true);
-    protected static final AtomicBoolean firstScanI = new AtomicBoolean(true);
+    private final AtomicBoolean STATUS = new AtomicBoolean(false);
+    private final AtomicBoolean ITEMSTATUS = new AtomicBoolean(false);
+    protected static final AtomicBoolean antiDupeE = new AtomicBoolean(true);
+    protected static final AtomicBoolean antiDupeI = new AtomicBoolean(true);
 
     @SubscribeEvent
     public void onEntityEvent(final EntityEvent event) {
         if (!Main.enabled) return;
+        if (STATUS.get()) return;
         if (Minecraft.getMinecraft().world == null) return;
         if (!TotemEvent.instanceOccupied.get()) return;
-        if(entityOccupied.get()) return;
         CompletableFuture.runAsync(() -> {
-            entityOccupied.set(true);
+            STATUS.set(true);
+            final List<Entity> entityList = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
             final AnnouncerSpirit messenger = new AnnouncerSpirit();
-            final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
-            for(Entity e :worldEntity) {
-                if (!(e instanceof EntityArmorStand)) continue;
+            for (Entity e : entityList) {
+                if (!(e instanceof EntityArmorStand)) {
+                    continue;
+                }
                 final UUID entityUUID = e.getUniqueID();
                 String mobOrItemName = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                 if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName))
-                    return;
+                    continue;
                 if (Main.advlog) {
                     messenger.send(new TextComponentString("Processing entity " + e.getClass().getName()).setStyle(
                             new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(e.toString())))
@@ -50,20 +53,19 @@ public class entityEvent {
                 if (name.toLowerCase(Locale.ROOT).contains("combat xp")) {
                     if (Main.log)
                         messenger.send("Detected mob kill.");
-                    if(!firstScanE.get()) {
+                    if (!antiDupeE.get())
                         TotemEvent.mobKills++;
-                    }
                 }
                 UUIDMap.put(entityUUID, mobOrItemName);
             }
-            firstScanE.set(false);
-        }).whenComplete((x, throwable) -> entityOccupied.set(false))
-                .exceptionally(e -> {
-                    if(Main.log)
-                        new AnnouncerSpirit().sendException((Exception) e);
-                    entityOccupied.set(false);
-                    return null;
-        });
+            antiDupeE.set(false);
+            STATUS.set(false);
+        }).exceptionally(e -> {
+            if (!(e instanceof ReportedException)) e.printStackTrace();
+            STATUS.set(false);
+            return null;
+        }).whenComplete((c, throwable) -> STATUS.set(false)
+        );
     }
 
     @SubscribeEvent
@@ -71,19 +73,21 @@ public class entityEvent {
         if (!Main.enabled) return;
         if (!TotemEvent.instanceOccupied.get())
             return;
+        if (ITEMSTATUS.get())
+            return;
         if (Minecraft.getMinecraft().world == null)
             return;
-        if(itemOccupied.get()) return;
         CompletableFuture.runAsync(() -> {
             final AnnouncerSpirit messenger = new AnnouncerSpirit();
+            ITEMSTATUS.set(true);
             final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
-            for(Entity e : worldEntity) {
+            for (Entity e : worldEntity) {
                 if (!(e instanceof EntityItem)) continue;
                 if (e.getName().contains("NPC")) continue;
-                if (e.getName().equals("item.tile.air")) continue;
                 if (e.serializeNBT().hasKey("NoGravity", 1)) continue;
                 NBTTagCompound trimmedNBT = e.serializeNBT();
-                if (trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner")) continue; // Cape thingy
+                if (trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner"))
+                    continue; // Cape thingy
                 trimmedNBT.removeTag("Age");
                 trimmedNBT.removeTag("Motion");
                 trimmedNBT.removeTag("Pos");
@@ -101,21 +105,20 @@ public class entityEvent {
                             ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
                                     e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                 }
-                if(!firstScanI.get()) {
+                if(!antiDupeI.get())
                     TotemEvent.drops.addDrop(ItemDB.getTier(wItemName));
-                }
                 UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
             }
-            firstScanI.set(false);
+            antiDupeI.set(false);
+            ITEMSTATUS.set(false);
         }).exceptionally(e -> {
-            if(Main.log)
-                new AnnouncerSpirit().sendException((Exception) e);
+            ITEMSTATUS.set(false);
+            final AnnouncerSpirit messenger = new AnnouncerSpirit();
+            if (Main.log) messenger.sendException((Exception) e);
             e.printStackTrace();
-            itemOccupied.set(false);
             return null;
-        }).whenComplete((x, t) -> itemOccupied.set(false));
+        }).thenAccept(x -> ITEMSTATUS.set(false));
     }
-
 
     private String format(String s) {
         return s

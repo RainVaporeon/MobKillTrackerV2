@@ -41,6 +41,8 @@ public class TotemEvent {
             entityEvent.UUIDMap.clear();
             mobKills = 0;
             drops.setAllowUpdates(true);
+            entityEvent.antiDupeE.set(true);
+            entityEvent.antiDupeI.set(true);
             messenger.send("Detected mob totem, started recording...");
             instanceOccupied.set(true);
             scheduler.schedule(summary, duration, TimeUnit.SECONDS);
