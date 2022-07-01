@@ -73,6 +73,7 @@ public class entityEvent {
             return;
         if (Minecraft.getMinecraft().world == null)
             return;
+        if(itemOccupied.get()) return;
         CompletableFuture.runAsync(() -> {
             final AnnouncerSpirit messenger = new AnnouncerSpirit();
             final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());

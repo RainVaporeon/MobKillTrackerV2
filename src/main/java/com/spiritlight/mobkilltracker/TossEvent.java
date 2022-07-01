@@ -15,10 +15,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TossEvent {
+    private final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean processToss = new AtomicBoolean(false);
 
     // wtf is this
@@ -32,14 +36,25 @@ public class TossEvent {
         if (processToss.get()) return;
         CompletableFuture.runAsync(() -> {
             processToss.set(true);
-            final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
             final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
             for(Entity e : worldEntity) {
-                if (!(e.posY - 1.31999999284744 == playerSP.posY)) continue;
+                if (!(e instanceof EntityItem)) continue;
                 if (e.getName().contains("NPC")) continue;
+                if (e.getName().equals("item.tile.air")) continue;
                 if (e.serializeNBT().hasKey("NoGravity", 1)) continue;
                 NBTTagCompound trimmedNBT = e.serializeNBT();
-                if (trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner")) continue;
+                if (trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner")) continue; // Cape thingy
+                trimmedNBT.removeTag("Age");
+                trimmedNBT.removeTag("Motion");
+                trimmedNBT.removeTag("Pos");
+                trimmedNBT.removeTag("Fire");
+                trimmedNBT.removeTag("FallDistance");
+                trimmedNBT.removeTag("PickupDelay");
+                trimmedNBT.removeTag("OnGround");
+                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT.toString()))
+                    continue;
+                final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
+                if (!(e.posY - 1.31999999284744 == playerSP.posY)) continue;
                 final AnnouncerSpirit messenger = new AnnouncerSpirit();
                 final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
                 if (Main.log) {
@@ -50,6 +65,7 @@ public class TossEvent {
                                     e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                 }
                 TotemEvent.drops.removeDrop(ItemDB.getTier(name), 2); // Init inclusion. + ext. drop
+                UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
             }
         }).whenComplete((x, throwable) -> processToss.set(false))
                 .exceptionally(e -> {
@@ -57,6 +73,7 @@ public class TossEvent {
                     if(Main.log) {
                         new AnnouncerSpirit().sendException((Exception) e);
                     }
+                    processToss.set(false);
                     return null;
                 });
     }
