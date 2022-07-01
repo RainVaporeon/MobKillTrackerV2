@@ -53,6 +53,7 @@ public class TossEvent {
         processToss.set(true);
         final AnnouncerSpirit messenger = new AnnouncerSpirit();
         for(EntityItem e : processQueue) {
+            if(e.ticksExisted < 1) continue;
             final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
             if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(name)) continue;
             int wItemQuantity = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
@@ -65,6 +66,7 @@ public class TossEvent {
                                 e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
             }
             UUIDMap.put(e.getUniqueID(), name);
+            processQueue.remove(e);
         }
         processToss.set(false);
     }
