@@ -57,7 +57,8 @@ public class TotemEvent {
 
     protected static void terminate() {
         summary.run();
-        scheduler.shutdown();
+        scheduler.shutdownNow();
+
     }
 
     private static final Runnable summary = () -> {
