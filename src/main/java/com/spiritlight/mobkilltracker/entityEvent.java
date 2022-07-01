@@ -1,6 +1,7 @@
 package com.spiritlight.mobkilltracker;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.item.EntityItem;
@@ -90,7 +91,10 @@ public class entityEvent {
                 String wItemName = nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
                 if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(wItemName))
                     continue;
-                int wItemQuantity = nbt.getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
+                final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
+                // rev. cond w/ tossEvent
+                if ((e.posY - 1.31999999284744 == playerSP.posY) || (e.getPosition() == playerSP.getPosition())) continue;
+                int wItemQuantity = nbt.getCompoundTag("Item").getInteger("Count");
                 if (Main.log) {
                     messenger.send(new TextComponentString("Found item of " + e.getName()).setStyle(
                             new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -98,6 +102,7 @@ public class entityEvent {
                             ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
                                     e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                 }
+
                 if(!antiDupeI.get())
                     TotemEvent.drops.addDrop(ItemDB.getTier(wItemName), wItemQuantity);
                 UUIDMap.put(e.getUniqueID(), wItemName);
