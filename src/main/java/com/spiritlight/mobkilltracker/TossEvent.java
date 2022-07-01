@@ -58,6 +58,7 @@ public class TossEvent {
                 if (!(e.posY - 1.31999999284744 == playerSP.posY)) continue;
                 final AnnouncerSpirit messenger = new AnnouncerSpirit();
                 final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
+                int wItemQuantity = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
                 if (Main.log) {
                     messenger.send(new TextComponentString("Found tossed item of " + e.getName()).setStyle(
                             new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -65,7 +66,7 @@ public class TossEvent {
                             ).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/compass " +
                                     e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                 }
-                TotemEvent.drops.removeDrop(ItemDB.getTier(name), 2); // Init inclusion. + ext. drop
+                TotemEvent.drops.removeDrop(ItemDB.getTier(name), wItemQuantity+1); // Init inclusion. + ext. drop
                 UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
             }
         }).whenComplete((x, throwable) -> processToss.set(false))

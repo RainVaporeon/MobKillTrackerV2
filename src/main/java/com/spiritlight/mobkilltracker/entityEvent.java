@@ -98,6 +98,7 @@ public class entityEvent {
                 if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT.toString()))
                     continue;
                 String wItemName = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
+                int wItemQuantity = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
                 if (Main.log) {
                     messenger.send(new TextComponentString("Found item of " + e.getName()).setStyle(
                             new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -106,8 +107,8 @@ public class entityEvent {
                                     e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                 }
                 if(!antiDupeI.get())
-                    TotemEvent.drops.addDrop(ItemDB.getTier(wItemName));
-                UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
+                    TotemEvent.drops.addDrop(ItemDB.getTier(wItemName), wItemQuantity);
+                UUIDMap.put(e.getUniqueID(), wItemName);
             }
             antiDupeI.set(false);
             ITEMSTATUS.set(false);
