@@ -43,21 +43,14 @@ public class TossEvent {
                 if (e.getName().contains("NPC")) continue;
                 if (e.getName().equals("item.tile.air")) continue;
                 if (e.serializeNBT().hasKey("NoGravity", 1)) continue;
-                NBTTagCompound trimmedNBT = e.serializeNBT();
-                if (trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner")) continue; // Cape thingy
-                trimmedNBT.removeTag("Age");
-                trimmedNBT.removeTag("Motion");
-                trimmedNBT.removeTag("Pos");
-                trimmedNBT.removeTag("Fire");
-                trimmedNBT.removeTag("FallDistance");
-                trimmedNBT.removeTag("PickupDelay");
-                trimmedNBT.removeTag("OnGround");
-                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT.toString()))
+                NBTTagCompound nbt = e.serializeNBT();
+                if (nbt.hasKey("Passengers") && nbt.toString().contains("Banner")) continue; // Cape thingy
+                final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
+                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(name))
                     continue;
                 final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
                 if (!(e.posY - 1.31999999284744 == playerSP.posY)) continue;
                 final AnnouncerSpirit messenger = new AnnouncerSpirit();
-                final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
                 int wItemQuantity = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
                 if (Main.log) {
                     messenger.send(new TextComponentString("Found tossed item of " + e.getName()).setStyle(
@@ -67,7 +60,7 @@ public class TossEvent {
                                     e.getPosition().getX() + " " + e.getPosition().getY() + " " + e.getPosition().getZ()))));
                 }
                 TotemEvent.drops.removeDrop(ItemDB.getTier(name), wItemQuantity+1); // Init inclusion. + ext. drop
-                UUIDMap.put(e.getUniqueID(), trimmedNBT.toString());
+                UUIDMap.put(e.getUniqueID(), name);
             }
         }).whenComplete((x, throwable) -> processToss.set(false))
                 .exceptionally(e -> {

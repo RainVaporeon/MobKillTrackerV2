@@ -85,20 +85,12 @@ public class entityEvent {
                 if (!(e instanceof EntityItem)) continue;
                 if (e.getName().contains("NPC")) continue;
                 if (e.serializeNBT().hasKey("NoGravity", 1)) continue;
-                NBTTagCompound trimmedNBT = e.serializeNBT();
-                if (trimmedNBT.hasKey("Passengers") && trimmedNBT.toString().contains("Banner"))
-                    continue; // Cape thingy
-                trimmedNBT.removeTag("Age");
-                trimmedNBT.removeTag("Motion");
-                trimmedNBT.removeTag("Pos");
-                trimmedNBT.removeTag("Fire");
-                trimmedNBT.removeTag("FallDistance");
-                trimmedNBT.removeTag("PickupDelay");
-                trimmedNBT.removeTag("OnGround");
-                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(trimmedNBT.toString()))
+                NBTTagCompound nbt = e.serializeNBT();
+                if (nbt.hasKey("Passengers") && nbt.toString().contains("Banner")) continue; // Cape thingy
+                String wItemName = nbt.getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
+                if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(wItemName))
                     continue;
-                String wItemName = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
-                int wItemQuantity = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
+                int wItemQuantity = nbt.getCompoundTag("Item").getCompoundTag("tag").getInteger("Count");
                 if (Main.log) {
                     messenger.send(new TextComponentString("Found item of " + e.getName()).setStyle(
                             new Style().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
