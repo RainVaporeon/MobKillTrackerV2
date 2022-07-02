@@ -13,6 +13,9 @@ Normal command is /mkt. Here are the available commands:
 - advanced: Shows detailed info (Item/ingredient rates)
 - time: Shows/sets hotkey timer (Default M for triggering)
 
+## API Calling
+You may see the API calls in API.java; the mod calls for data exactly 5 times per session (and extra 5 every time you recollect API)
+
 ## Debug commands
 Command is always /mkt-debug (or /mktd for short)
 
