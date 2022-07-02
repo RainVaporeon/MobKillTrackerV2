@@ -50,9 +50,8 @@ public class TotemEvent {
             try {
                 if(scheduler.isTerminated()) {
                     scheduler = Executors.newSingleThreadScheduledExecutor();
-                } else {
-                    scheduler.schedule(summary, duration, TimeUnit.SECONDS);
                 }
+                scheduler.schedule(summary, duration, TimeUnit.SECONDS);
             } catch (RejectedExecutionException ex) {
                 new AnnouncerSpirit().send("Error: The responsible thread is not available right now. Please try again later.");
                 instanceOccupied.set(false);
@@ -83,6 +82,8 @@ public class TotemEvent {
         final int totalDrops = drops.getTotal(0);
         final int itemDrops = drops.getTotal(1);
         final int ingDrops = drops.getTotal(2);
+        final int ingRate = (ingDrops == 0 ? 0 : mobKills / ingDrops);
+        final int itemRate = (itemDrops == 0 ? 0 : mobKills / itemDrops);
         messenger.send(
                 "\n" +
                         "§3§l Mob Totem Ended\n" +
@@ -100,8 +101,8 @@ public class TotemEvent {
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
                         "Total drops: Item " + itemDrops + ", Ingredients " + ingDrops +
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
-                                "§rItem Rate: " + mobKills / (itemDrops == 0 ? 1 : itemDrops) + " §7(Mobs/item)" + "\n" +
-                                "§rIngredient Rate: " + mobKills / (ingDrops == 0 ? 1 : ingDrops) + " §7(Mobs/Ingredient)" : "")
+                                "§rItem Rate: " + itemRate + " §7(Mobs/item)" + "\n" +
+                                "§rIngredient Rate: " + ingRate + " §7(Mobs/Ingredient)" : "")
         );
         entityEvent.UUIDMap.clear(); // Releasing resources
         drops.clear();
