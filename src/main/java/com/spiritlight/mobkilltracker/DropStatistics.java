@@ -45,7 +45,15 @@ public class DropStatistics {
         T0Ingredients = 0;
     }
 
-    // 0: all; 1: item; def: ingredients
+
+    /**
+     * Gets total drops of the specified type.
+     *
+     * @param type 0: All kinds of drops<br>
+     *             1: Exclusively items<br>
+     *             2: Exclusively ingredients
+     * @return The total drop of specified type
+     */
     public int getTotal(int type) {
         return (type == 0 ? MythicDropped +
                 FabledDropped +
@@ -119,6 +127,13 @@ public class DropStatistics {
         return T0Ingredients;
     }
 
+
+    /**
+     * Adds a value to the specified tier. If the tier is {@link Tier#UNKNOWN} or null, it does not add anything.
+     *
+     * @param tier The tier to add
+     * @param quantity The amount to add
+     */
     public void addDrop(Tier tier, int quantity) {
         if(!allowUpdates) {
             // Does not allow updates, whether a totem is not in progress or already ended.

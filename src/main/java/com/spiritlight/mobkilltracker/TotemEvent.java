@@ -86,9 +86,11 @@ public class TotemEvent {
         final int itemRate = (itemDrops == 0 ? 0 : mobKills / itemDrops);
         messenger.send(
                 "\n" +
-                        "§3§lTotem Summary §7(Last session)\n" +
+                        "§3§l Mob Totem Ended\n" +
                         "§rTotal Mobs Killed: §c" + mobKills + "\n" +
                         "§rTotal Items Dropped: §a" + totalDrops + "\n" +
+                        "\n" +
+                        "§6§l Item Summary: \n" +
                         "§rIngredient Drops: §b[✫✫✫] §rx" + drops.getT3Ingredients() + " §d[✫✫§8✫§d] §rx" + drops.getT2Ingredients() + " §e[✫§8✫✫§e] §rx" + drops.getT1Ingredients() + " §7[§8✫✫✫§7] §rx" + drops.getT0Ingredients() + "\n" +
                         "§5§lMythic §rDrops: " + drops.getMythicDropped() + "\n" +
                         "§cFabled §rDrops: " + drops.getFabledDropped() + "\n" +
