@@ -13,7 +13,24 @@ public class DropStatistics {
     private int T1Ingredients = 0;
     private int T0Ingredients = 0;
     private boolean allowUpdates = true;
-    
+
+    public DropStatistics(DropStatistics drops) {
+        MythicDropped = drops.MythicDropped;
+        FabledDropped = drops.FabledDropped;
+        LegendaryDropped = drops.LegendaryDropped;
+        RareDropped = drops.RareDropped;
+        SetDropped = drops.SetDropped;
+        UniqueDropped = drops.UniqueDropped;
+        NormalDropped = drops.NormalDropped;
+        T3Ingredients = drops.T3Ingredients;
+        T2Ingredients = drops.T2Ingredients;
+        T1Ingredients = drops.T1Ingredients;
+        T0Ingredients = drops.T0Ingredients;
+        allowUpdates = drops.allowUpdates;
+    }
+
+    public DropStatistics() {}
+
     public void clear() {
         MythicDropped = 0;
         FabledDropped = 0;

@@ -33,6 +33,7 @@ public class TotemCommand extends CommandBase {
             messenger.send("Invalid syntax. Available commands:\n" +
                     "/" + getName() + " start [duration] - Records mob area for x seconds, default 30.\n" +
                     "/" + getName() + " stop - Terminates current scan and dump the summary\n" +
+                    "/" + getName() + " last - Dumps last totem data\n" +
                     "/" + getName() + " time [duration] - Sets default keybind duration.\n" +
                     "/" + getName() + " advanced - Toggles advanced recording mode\n" +
                     "/" + getName() + " toggle - Toggles mod function");
@@ -51,6 +52,11 @@ public class TotemCommand extends CommandBase {
                 } catch (NumberFormatException ex) {
                     messenger.send("Failed to parse the duration input.");
                 }
+                break;
+            case "lasttotem":
+            case "last":
+                messenger.send("Dumping last session data...");
+                summary.run();
                 break;
             case "stop":
                 if (TotemEvent.instanceOccupied.get()) {
@@ -87,4 +93,35 @@ public class TotemCommand extends CommandBase {
                 messenger.send("Invalid syntax. Try /mkt");
         }
     }
+
+    private static final Runnable summary = () -> {
+        final AnnouncerSpirit messenger = new AnnouncerSpirit();
+        final DropStatistics drops = Main.cachedDrops;
+        final int mobKills = Main.cachedKills;
+        final int totalDrops = drops.getTotal(0);
+        final int itemDrops = drops.getTotal(1);
+        final int ingDrops = drops.getTotal(2);
+        final int ingRate = (ingDrops == 0 ? 0 : mobKills / ingDrops);
+        final int itemRate = (itemDrops == 0 ? 0 : mobKills / itemDrops);
+        messenger.send(
+                "\n" +
+                        "§3§l Mob Totem Ended\n" +
+                        "§rTotal Mobs Killed: §c" + mobKills + "\n" +
+                        "§rTotal Items Dropped: §a" + totalDrops + "\n" +
+                        "\n" +
+                        "§6§l Item Summary: \n" +
+                        "§rIngredient Drops: §b[✫✫✫] §rx" + drops.getT3Ingredients() + " §d[✫✫§8✫§d] §rx" + drops.getT2Ingredients() + " §e[✫§8✫✫§e] §rx" + drops.getT1Ingredients() + " §7[§8✫✫✫§7] §rx" + drops.getT0Ingredients() + "\n" +
+                        "§5§lMythic §rDrops: " + drops.getMythicDropped() + "\n" +
+                        "§cFabled §rDrops: " + drops.getFabledDropped() + "\n" +
+                        "§bLegendary §rDrops: " + drops.getLegendaryDropped() + "\n" +
+                        "§dRare §rDrops: " + drops.getRareDropped() + "\n" +
+                        "§aSet §rDrops: " + drops.getSetDropped() + "\n" +
+                        "§eUnique §rDrops: " + drops.getUniqueDropped() + "\n" +
+                        "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
+                        "Total drops: Item " + itemDrops + ", Ingredients " + ingDrops +
+                        (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
+                                "§rItem Rate: " + itemRate + " §7(Mobs/item)" + "\n" +
+                                "§rIngredient Rate: " + ingRate + " §7(Mobs/Ingredient)" : "")
+        );
+    };
 }
