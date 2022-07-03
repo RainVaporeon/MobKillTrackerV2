@@ -24,14 +24,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TossEvent {
     protected static final List<EntityItem> processQueue = new CopyOnWriteArrayList<>();
     private final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean processToss = new AtomicBoolean(false);
-    private final List<EntityPlayer> pList = new ArrayList<>();
+    private final double MAGIC_TOSS_Y = 1.31999999284744;
 
     // wtf is this
     @SubscribeEvent
@@ -51,21 +49,14 @@ public class TossEvent {
         if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(name)) return;
         if(Main.cleaner) {
             final List<EntityPlayer> playerList = new ArrayList<>(Minecraft.getMinecraft().world.playerEntities);
-            Stream<EntityPlayer> stream = playerList.parallelStream().filter(player -> (!player.isDead && player.getHealth() > 0))
+            boolean isFound = playerList.stream().filter(player -> (!player.isDead && player.getHealth() > 0))
                     .filter(player -> !player.isInvisible())
-                    .filter(player -> !(player instanceof FakePlayer));
-            pList.addAll(stream.collect(Collectors.toList()));
-            boolean isFound = false;
-            for(EntityPlayer player : pList) {
-                if(player.posY == e.posY - 1.31999999284744) {
-                    isFound = true;
-                    break;
-                }
-            }
+                    .filter(player -> !(player instanceof FakePlayer))
+                    .anyMatch(player -> player.posY == e.posY - MAGIC_TOSS_Y);
             if(!isFound) return;
         } else {
             final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
-            if (!(e.posY - 1.31999999284744 == playerSP.posY)) return;
+            if (!(e.posY - MAGIC_TOSS_Y == playerSP.posY)) return;
         }
         processQueue.add((EntityItem) e);
         if(processToss.get()) return;
