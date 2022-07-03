@@ -25,6 +25,7 @@ public class Main
     static boolean advlog = false;
     static boolean enabled = true;
     static boolean logAdvanced = false;
+    static boolean cleaner = false;
     static int def_duration = 30;
     static final String PREFIX = "§2[§aMKT §ev2§2] §a";
 

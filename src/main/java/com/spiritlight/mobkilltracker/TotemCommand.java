@@ -36,7 +36,9 @@ public class TotemCommand extends CommandBase {
                     "/" + getName() + " last - Dumps last totem data\n" +
                     "/" + getName() + " time [duration] - Sets default keybind duration.\n" +
                     "/" + getName() + " advanced - Toggles advanced recording mode\n" +
-                    "/" + getName() + " toggle - Toggles mod function");
+                    "/" + getName() + " toggle - Toggles mod function\n" +
+                    "/" + getName() + " cleaner - Toggles other cleaner detections\n" +
+                    "Note: May be inaccurate and should be off if you are cleaning alone.");
             return;
         }
         switch (args[0].toLowerCase(Locale.ROOT)) {
@@ -53,7 +55,10 @@ public class TotemCommand extends CommandBase {
                     messenger.send("Failed to parse the duration input.");
                 }
                 break;
-            case "lasttotem":
+            case "cleaner":
+                Main.cleaner = !Main.cleaner;
+                messenger.send("OK, now " + (Main.cleaner ? "will" : "will no longer") + " check other player tosses.");
+                break;
             case "last":
                 messenger.send("Dumping last session data...");
                 summary.run();

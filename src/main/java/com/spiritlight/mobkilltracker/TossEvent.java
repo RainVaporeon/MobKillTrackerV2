@@ -4,15 +4,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,11 +24,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TossEvent {
     protected static final List<EntityItem> processQueue = new CopyOnWriteArrayList<>();
     private final Map<UUID, String> UUIDMap = new ConcurrentHashMap<>();
     private final AtomicBoolean processToss = new AtomicBoolean(false);
+    private final List<EntityPlayer> pList = new ArrayList<>();
 
     // wtf is this
     @SubscribeEvent
@@ -42,8 +49,24 @@ public class TossEvent {
         if (nbt.hasKey("Passengers") && nbt.toString().contains("Banner")) return; // Cape thingy
         final String name = e.serializeNBT().getCompoundTag("Item").getCompoundTag("tag").getCompoundTag("display").getString("Name");
         if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(name)) return;
-        final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
-        if (!(e.posY - 1.31999999284744 == playerSP.posY)) return;
+        if(Main.cleaner) {
+            final List<EntityPlayer> playerList = new ArrayList<>(Minecraft.getMinecraft().world.playerEntities);
+            Stream<EntityPlayer> stream = playerList.parallelStream().filter(player -> (!player.isDead && player.getHealth() > 0))
+                    .filter(player -> !player.isInvisible())
+                    .filter(player -> !(player instanceof FakePlayer));
+            pList.addAll(stream.collect(Collectors.toList()));
+            boolean isFound = false;
+            for(EntityPlayer player : pList) {
+                if(player.posY == e.posY - 1.31999999284744) {
+                    isFound = true;
+                    break;
+                }
+            }
+            if(!isFound) return;
+        } else {
+            final EntityPlayerSP playerSP = Minecraft.getMinecraft().player;
+            if (!(e.posY - 1.31999999284744 == playerSP.posY)) return;
+        }
         processQueue.add((EntityItem) e);
         if(processToss.get()) return;
         CompletableFuture.runAsync(this::process).whenComplete((x, throwable) -> processToss.set(false));
