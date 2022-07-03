@@ -34,5 +34,6 @@ aaaa IntellIJ IDEA with Java 8u211
 
 ## Known Issues
 
-- Serious performance issues during scan period.
-- IndexOOB error may occur.
+- IndexOOB error may occur during debug (Not sure why, seems to be an internal error)
+- Inaccuracies may occur when throwing items in bulk
+- Items thrown by other players are not detected 
