@@ -3,6 +3,8 @@ Tracks totem stats for mythic farms
 
 #### Note: This mod cannot detect if items were thrown by the player or dropped from the mob, hence if you have any cleaners, the numbers will go off.
 
+Also please note that it can detect items that you have thrown. Extra detections for all loaded players will be in future releases.
+
 ## Usage
 Everything's automated, timer starts when a totem placement is detected; stops when exactly 5 minutes has passed (due to totem expiration message will not always appear)
 
