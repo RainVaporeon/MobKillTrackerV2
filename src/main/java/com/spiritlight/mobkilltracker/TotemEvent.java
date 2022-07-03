@@ -3,6 +3,7 @@ package com.spiritlight.mobkilltracker;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -11,6 +12,7 @@ public class TotemEvent {
     protected final static DropStatistics drops = new DropStatistics();
     static int mobKills = 0;
     private static ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private static final DecimalFormat dFormat = new DecimalFormat("0.00");
 
     @SubscribeEvent
     public void onMessage(ClientChatReceivedEvent chat) {
@@ -82,8 +84,9 @@ public class TotemEvent {
         final int totalDrops = drops.getTotal(0);
         final int itemDrops = drops.getTotal(1);
         final int ingDrops = drops.getTotal(2);
-        final int ingRate = (ingDrops == 0 ? 0 : mobKills / ingDrops);
-        final int itemRate = (itemDrops == 0 ? 0 : mobKills / itemDrops);
+        final double kills = mobKills; // Prevent ctx warning
+        final double ingRate = (ingDrops == 0 ? 0 : kills / ingDrops);
+        final double itemRate = (itemDrops == 0 ? 0 : kills / itemDrops);
         messenger.send(
                 "\n" +
                         "§3§l Mob Totem Ended\n" +
@@ -101,8 +104,8 @@ public class TotemEvent {
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
                         "Total drops: Item " + itemDrops + ", Ingredients " + ingDrops +
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
-                                "§rItem Rate: " + itemRate + " §7(Mobs/item)" + "\n" +
-                                "§rIngredient Rate: " + ingRate + " §7(Mobs/Ingredient)" : "")
+                                "§rItem Rate: " + dFormat.format(itemRate) + " §7(Mobs/item)" + "\n" +
+                                "§rIngredient Rate: " + dFormat.format(ingRate) + " §7(Mobs/Ingredient)" : "")
         );
         entityEvent.UUIDMap.clear(); // Releasing resources
         Main.cachedDrops = new DropStatistics(drops);

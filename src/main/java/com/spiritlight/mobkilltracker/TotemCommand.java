@@ -101,8 +101,8 @@ public class TotemCommand extends CommandBase {
         final int totalDrops = drops.getTotal(0);
         final int itemDrops = drops.getTotal(1);
         final int ingDrops = drops.getTotal(2);
-        final int ingRate = (ingDrops == 0 ? 0 : mobKills / ingDrops);
-        final int itemRate = (itemDrops == 0 ? 0 : mobKills / itemDrops);
+        final int ingRate = (mobKills == 0 || ingDrops == 0 ? 0 : mobKills / ingDrops);
+        final int itemRate = (mobKills == 0 || itemDrops == 0 ? 0 : mobKills / itemDrops);
         messenger.send(
                 "\n" +
                         "§3§lTotem Summary §7(Last session)\n" +
