@@ -12,6 +12,7 @@ public class DropStatistics {
     private int T2Ingredients = 0;
     private int T1Ingredients = 0;
     private int T0Ingredients = 0;
+    private int kills = 0;
     private boolean allowUpdates = true;
 
     public DropStatistics(DropStatistics drops) {
@@ -26,6 +27,7 @@ public class DropStatistics {
         T2Ingredients = drops.T2Ingredients;
         T1Ingredients = drops.T1Ingredients;
         T0Ingredients = drops.T0Ingredients;
+        kills = drops.kills;
         allowUpdates = drops.allowUpdates;
     }
 
@@ -43,6 +45,7 @@ public class DropStatistics {
         T2Ingredients = 0;
         T1Ingredients = 0;
         T0Ingredients = 0;
+        kills = 0;
     }
 
 
@@ -126,6 +129,10 @@ public class DropStatistics {
     public int getT0Ingredients() {
         return T0Ingredients;
     }
+
+    public int getKills() { return kills; }
+
+    public void setKills(int kills) { this.kills = kills; }
 
 
     /**

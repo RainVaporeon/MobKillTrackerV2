@@ -80,6 +80,7 @@ public class TotemEvent {
     private static final Runnable summary = () -> {
         final AnnouncerSpirit messenger = new AnnouncerSpirit();
         if(!instanceOccupied.get()) return;
+        drops.setKills(mobKills);
         drops.setAllowUpdates(false);
         final int totalDrops = drops.getTotal(0);
         final int itemDrops = drops.getTotal(1);
@@ -90,7 +91,7 @@ public class TotemEvent {
         messenger.send(
                 "\n" +
                         "§3§l Mob Totem Ended\n" +
-                        "§rTotal Mobs Killed: §c" + mobKills + "\n" +
+                        "§rTotal Mobs Killed: §c" + drops.getKills() + "\n" +
                         "§rTotal Items Dropped: §a" + totalDrops + "\n" +
                         "\n" +
                         "§6§l Item Summary: \n" +
@@ -109,6 +110,7 @@ public class TotemEvent {
         );
         entityEvent.UUIDMap.clear(); // Releasing resources
         Main.cachedDrops = new DropStatistics(drops);
+        Main.sessionDrops.add(new DropStatistics(drops));
         Main.cachedKills = mobKills;
         drops.clear();
         instanceOccupied.set(false); // Call at last line

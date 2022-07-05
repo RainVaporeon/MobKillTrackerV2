@@ -38,6 +38,7 @@ public class TotemCommand extends CommandBase {
                     "/" + getName() + " advanced - Toggles advanced recording mode\n" +
                     "/" + getName() + " toggle - Toggles mod function\n" +
                     "/" + getName() + " cleaner - Toggles other cleaner detections\n" +
+                    "/" + getName() + " trace - Traces session data\n" +
                     "Note: May be inaccurate and should be off if you are cleaning alone.");
             return;
         }
@@ -61,7 +62,7 @@ public class TotemCommand extends CommandBase {
                 break;
             case "last":
                 messenger.send("Dumping last session data...");
-                summary.run();
+                summary(Main.cachedDrops);
                 break;
             case "stop":
                 if (TotemEvent.instanceOccupied.get()) {
@@ -94,23 +95,49 @@ public class TotemCommand extends CommandBase {
                     messenger.send("Failed to parse the duration input.");
                 }
                 break;
+            case "trace":
+                if(args.length == 1) {
+                    messenger.send("There are currently " + Main.sessionDrops.size() + " stats available.");
+                    messenger.send("Do /" + getName() + " trace list to see all of them in brief context.");
+                    messenger.send("Or do /" + getName() + " trace <index> to see the specific of that stat.");
+                    return;
+                }
+                if(args[1].toLowerCase(Locale.ROOT).equals("list")) {
+                    messenger.send("- - - Current Session Caches - - -");
+                    for(int i=0; i < Main.sessionDrops.size(); i++) {
+                        final DropStatistics tmp = Main.sessionDrops.get(i);
+                        messenger.send("Cache #" + i + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)");
+                    }
+                    return;
+                }
+                int idx;
+                try {
+                    idx = Integer.parseInt(args[1]);
+                } catch (NumberFormatException ex) {
+                    messenger.send("Invalid index.");
+                    return;
+                }
+                if(idx > Main.sessionDrops.size() || idx < 0) {
+                    messenger.send("Index illegal. Max index allowed: " + Main.sessionDrops.size());
+                    return;
+                }
+                summary(Main.sessionDrops.get(idx));
             default:
                 messenger.send("Invalid syntax. Try /mkt");
         }
     }
 
-    private static final Runnable summary = () -> {
+    private void summary(DropStatistics drops) {
         final AnnouncerSpirit messenger = new AnnouncerSpirit();
-        final DropStatistics drops = Main.cachedDrops;
-        final int mobKills = Main.cachedKills;
+        final int mobKills = drops.getKills();
         final int totalDrops = drops.getTotal(0);
         final int itemDrops = drops.getTotal(1);
         final int ingDrops = drops.getTotal(2);
-        final int ingRate = (mobKills == 0 || ingDrops == 0 ? 0 : mobKills / ingDrops);
-        final int itemRate = (mobKills == 0 || itemDrops == 0 ? 0 : mobKills / itemDrops);
+        final double ingRate = (ingDrops == 0 ? 0 : (double) mobKills / ingDrops);
+        final double itemRate = (itemDrops == 0 ? 0 : (double) mobKills / itemDrops);
         messenger.send(
                 "\n" +
-                        "§3§lTotem Summary §7(Last session)\n" +
+                        "§3§lTotem Summary\n" +
                         "§rTotal Mobs Killed: §c" + mobKills + "\n" +
                         "§rTotal Items Dropped: §a" + totalDrops + "\n" +
                         "§rIngredient Drops: §b[✫✫✫] §rx" + drops.getT3Ingredients() + " §d[✫✫§8✫§d] §rx" + drops.getT2Ingredients() + " §e[✫§8✫✫§e] §rx" + drops.getT1Ingredients() + " §7[§8✫✫✫§7] §rx" + drops.getT0Ingredients() + "\n" +
@@ -124,7 +151,6 @@ public class TotemCommand extends CommandBase {
                         "Total drops: Item " + itemDrops + ", Ingredients " + ingDrops +
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
                                 "§rItem Rate: " + itemRate + " §7(Mobs/item)" + "\n" +
-                                "§rIngredient Rate: " + ingRate + " §7(Mobs/Ingredient)" : "")
-        );
-    };
+                                "§rIngredient Rate: " + ingRate + " §7(Mobs/Ingredient)" : ""));
+    }
 }

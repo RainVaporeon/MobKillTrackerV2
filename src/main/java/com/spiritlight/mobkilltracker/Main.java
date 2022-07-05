@@ -8,6 +8,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
@@ -15,7 +17,7 @@ public class Main
 {
     public static final String MODID = "mkt";
     public static final String NAME = "MobKillTracker v2";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.3";
     // Lists are all Name:Tier
 
     protected static DropStatistics cachedDrops = new DropStatistics();
@@ -27,6 +29,7 @@ public class Main
     static boolean logAdvanced = false;
     static boolean cleaner = false;
     static int def_duration = 30;
+    static final List<DropStatistics> sessionDrops = new ArrayList<>();
     static final String PREFIX = "§2[§aMKT §ev2§2] §a";
 
     @EventHandler
