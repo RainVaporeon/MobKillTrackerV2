@@ -1,9 +1,11 @@
 # MobKillTrackerV2
 Tracks totem stats for mythic farms
 
-#### Note: This mod cannot detect if items were thrown by the player or dropped from the mob, hence if you have any cleaners, the numbers will go off.
+## Features
 
-Also please note that it can detect items that you have thrown. Extra detections for all loaded players will be in future releases.
+- Automatically collects data in totem (Kills, item drops, etc)
+- Commands that allow you to trace to any previous saved data (Within session)
+- Hotkey (Default M) to allow you to start recording kills/drops in a specified time range.
 
 ## Usage
 Everything's automated, timer starts when a totem placement is detected; stops when exactly 5 minutes has passed (due to totem expiration message will not always appear)
