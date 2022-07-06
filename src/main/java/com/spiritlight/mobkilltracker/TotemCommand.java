@@ -8,6 +8,9 @@ import net.minecraft.server.MinecraftServer;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 @ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
@@ -42,6 +45,7 @@ public class TotemCommand extends CommandBase {
                     "/" + getName() + " toggle - Toggles mod function\n" +
                     "/" + getName() + " cleaner - Toggles other cleaner detections\n" +
                     "/" + getName() + " trace - Traces session data\n" +
+                    "/" + getName() + " export - Exports data\n" +
                     "Note: May be inaccurate and should be off if you are cleaning alone.");
             return;
         }
@@ -109,13 +113,13 @@ public class TotemCommand extends CommandBase {
                     messenger.send("- - - Current Session Caches - - -");
                     for(int i=0; i < Main.sessionDrops.size(); i++) {
                         final DropStatistics tmp = Main.sessionDrops.get(i);
-                        messenger.send("Cache #" + i + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)");
+                        messenger.send("Cache #" + i+1 + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)");
                     }
                     return;
                 }
                 int idx;
                 try {
-                    idx = Integer.parseInt(args[1]);
+                    idx = Integer.parseInt(args[1])-1;
                 } catch (NumberFormatException ex) {
                     messenger.send("Invalid index.");
                     return;
@@ -125,6 +129,81 @@ public class TotemCommand extends CommandBase {
                     return;
                 }
                 summary(Main.sessionDrops.get(idx));
+                break;
+            case "export":
+                final int ENTRY_SIZE = Main.sessionDrops.size();
+                if(args.length == 1) {
+                    messenger.send("/" + getName() + " export ALL: Exports all session data as JSON.");
+                    messenger.send("/" + getName() + " export range <min> [max]: Exports session data in range as JSON.");
+                    messenger.send("/" + getName() + " export last: Exports last session data as JSON.");
+                    messenger.send("/" + getName() + " export #: Exports the #th index as JSON.");
+                    messenger.send("View stats via /" + getName() + " trace. There are " + ENTRY_SIZE + (ENTRY_SIZE == 1 ? " entry" : " entries") + " available.");
+                    return;
+                } else {
+                    if(Main.sessionDrops.size() == 0) {
+                        messenger.send("There are no available entry yet. Try recording some?");
+                        return;
+                    }
+                    switch(args[1]) {
+                        case "ALL":
+                            DropAnalyzer.exportDrops(new ArrayList<>(Main.sessionDrops));
+                            break;
+                        case "last":
+                            DropAnalyzer.exportDrops(Collections.singletonList(Main.cachedDrops));
+                            break;
+                        case "range":
+                            if(args.length == 2) {
+                                messenger.send("Invalid range.");
+                            } else if(args.length == 3) {
+                                try {
+                                    int x = Integer.parseInt(args[2]);
+                                    final List<DropStatistics> drops = new ArrayList<>();
+                                    for(int i=x-1; i<Main.sessionDrops.size(); i++) {
+                                        drops.add(Main.sessionDrops.get(i));
+                                    }
+                                    DropAnalyzer.exportDrops(drops);
+                                } catch (NumberFormatException ex) {
+                                    messenger.send("Invalid range specified.");
+                                    return;
+                                } catch (IndexOutOfBoundsException e) {
+                                    messenger.send("Index out of bounds. Max allowed size: " + ENTRY_SIZE);
+                                    return;
+                                }
+                            } else try {
+                                final List<DropStatistics> drops = new ArrayList<>();
+                                int x = Integer.parseInt(args[2]);
+                                int y = Integer.parseInt(args[3]);
+                                for(int i=x-1; i<y; i++) {
+                                    drops.add(Main.sessionDrops.get(i));
+                                }
+                                DropAnalyzer.exportDrops(drops);
+                            } catch (NumberFormatException ex) {
+                                messenger.send("Invalid range specified.");
+                                return;
+                            } catch (IndexOutOfBoundsException e) {
+                                messenger.send("Index out of bounds. Max allowed size: " + ENTRY_SIZE);
+                                return;
+                            }
+                            break;
+                        default:
+                            try {
+                                int x = Integer.parseInt(args[1]);
+                                DropAnalyzer.exportDrops(Collections.singletonList(Main.sessionDrops.get(x)));
+                            } catch (NumberFormatException ex) {
+                                messenger.send("Invalid range specified.");
+                                return;
+                            } catch (IndexOutOfBoundsException e) {
+                                messenger.send("Index out of bounds. Max allowed size: " + ENTRY_SIZE);
+                                return;
+                            }
+                            break;
+                    }
+                }
+                break;
+            case "__$copy.clipboard":
+                messenger.send("Copied to clipboard!");
+                DropAnalyzer.copyToClipboard();
+                break;
             default:
                 messenger.send("Invalid syntax. Try /mkt");
         }
