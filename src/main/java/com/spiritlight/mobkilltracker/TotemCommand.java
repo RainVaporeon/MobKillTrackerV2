@@ -156,9 +156,9 @@ public class TotemCommand extends CommandBase {
                                 messenger.send("Invalid range.");
                             } else if(args.length == 3) {
                                 try {
-                                    int x = Integer.parseInt(args[2]);
+                                    int x = Integer.parseInt(args[2])-1;
                                     final List<DropStatistics> drops = new ArrayList<>();
-                                    for(int i=x-1; i<Main.sessionDrops.size(); i++) {
+                                    for(int i=x; i<Main.sessionDrops.size(); i++) {
                                         drops.add(Main.sessionDrops.get(i));
                                     }
                                     DropAnalyzer.exportDrops(drops);
@@ -171,9 +171,9 @@ public class TotemCommand extends CommandBase {
                                 }
                             } else try {
                                 final List<DropStatistics> drops = new ArrayList<>();
-                                int x = Integer.parseInt(args[2]);
+                                int x = Integer.parseInt(args[2])-1;
                                 int y = Integer.parseInt(args[3]);
-                                for(int i=x-1; i<y; i++) {
+                                for(int i=x; i<y; i++) {
                                     drops.add(Main.sessionDrops.get(i));
                                 }
                                 DropAnalyzer.exportDrops(drops);
@@ -187,7 +187,7 @@ public class TotemCommand extends CommandBase {
                             break;
                         default:
                             try {
-                                int x = Integer.parseInt(args[1]);
+                                int x = Integer.parseInt(args[1])-1;
                                 DropAnalyzer.exportDrops(Collections.singletonList(Main.sessionDrops.get(x)));
                             } catch (NumberFormatException ex) {
                                 messenger.send("Invalid range specified.");
