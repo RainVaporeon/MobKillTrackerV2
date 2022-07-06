@@ -37,6 +37,7 @@ public class DropAnalyzer {
             object.addProperty("ingredient_t1", drops.getT1Ingredients());
             object.addProperty("ingredient_t0", drops.getT0Ingredients());
             object.addProperty("kills", drops.getKills());
+            object.addProperty("note", drops.getNote());
             array.add(object);
         }
         cached_element = array;

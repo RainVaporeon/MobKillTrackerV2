@@ -8,10 +8,7 @@ import net.minecraft.server.MinecraftServer;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
 public class TotemCommand extends CommandBase {
@@ -114,6 +111,9 @@ public class TotemCommand extends CommandBase {
                     for(int i=0; i < Main.sessionDrops.size(); i++) {
                         final DropStatistics tmp = Main.sessionDrops.get(i);
                         messenger.send("Cache #" + i+1 + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)");
+                        if(tmp.hasNote()) {
+                            messenger.send("§7Notes of this data: " + tmp.getNote());
+                        }
                     }
                     return;
                 }
@@ -130,10 +130,38 @@ public class TotemCommand extends CommandBase {
                 }
                 summary(Main.sessionDrops.get(idx));
                 break;
+            case "note":
+                if(args.length == 1) {
+                    messenger.send("/" + getName() + " note all [note] - Sets all drop data with the note.");
+                    messenger.send("/" + getName() + " note # [note] - Sets specified drop data with this note.");
+                    messenger.send("If note was left empty, the notes are cleared.");
+                    return;
+                }
+                final String note;
+                if(args.length >= 3) {
+                    note = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+                } else note = "";
+                if ("all".equals(args[1].toLowerCase(Locale.ROOT))) {
+                    messenger.send("Attaching note...");
+                    for (DropStatistics drops : Main.sessionDrops) {
+                        drops.setNote(note);
+                    }
+                    messenger.send("Finished!");
+                } else {
+                    try {
+                        idx = Integer.parseInt(args[1])-1;
+                        Main.sessionDrops.get(idx).setNote(note);
+                        messenger.send("Successfully attached note " + note + " to data #" + idx+1);
+                    } catch (NumberFormatException|IndexOutOfBoundsException ex) {
+                        messenger.send("Invalid operation.");
+                        return;
+                    }
+                }
+                break;
             case "export":
                 final int ENTRY_SIZE = Main.sessionDrops.size();
                 if(args.length == 1) {
-                    messenger.send("/" + getName() + " export ALL: Exports all session data as JSON.");
+                    messenger.send("/" + getName() + " export all: Exports all session data as JSON.");
                     messenger.send("/" + getName() + " export range <min> [max]: Exports session data in range as JSON.");
                     messenger.send("/" + getName() + " export last: Exports last session data as JSON.");
                     messenger.send("/" + getName() + " export #: Exports the #th index as JSON.");
@@ -144,8 +172,8 @@ public class TotemCommand extends CommandBase {
                         messenger.send("There are no available entry yet. Try recording some?");
                         return;
                     }
-                    switch(args[1]) {
-                        case "ALL":
+                    switch(args[1].toLowerCase(Locale.ROOT)) {
+                        case "all":
                             DropAnalyzer.exportDrops(new ArrayList<>(Main.sessionDrops));
                             break;
                         case "last":

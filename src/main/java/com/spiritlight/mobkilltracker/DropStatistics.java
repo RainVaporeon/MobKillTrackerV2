@@ -14,6 +14,7 @@ public class DropStatistics {
     private int T0Ingredients = 0;
     private int kills = 0;
     private boolean allowUpdates = true;
+    private String note = "";
 
     public DropStatistics(DropStatistics drops) {
         MythicDropped = drops.MythicDropped;
@@ -29,6 +30,7 @@ public class DropStatistics {
         T0Ingredients = drops.T0Ingredients;
         kills = drops.kills;
         allowUpdates = drops.allowUpdates;
+        note = drops.getNote();
     }
 
     public DropStatistics() {}
@@ -134,6 +136,11 @@ public class DropStatistics {
 
     public void setKills(int kills) { this.kills = kills; }
 
+    public String getNote() { return note; }
+
+    public void setNote(String note) { this.note = note; }
+
+    public boolean hasNote() { return !note.equals(""); }
 
     /**
      * Adds a value to the specified tier. If the tier is {@link Tier#UNKNOWN} or null, it does not add anything.
