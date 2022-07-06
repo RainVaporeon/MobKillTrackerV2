@@ -7,10 +7,13 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.text.DecimalFormat;
 import java.util.Locale;
 
 @ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
 public class TotemCommand extends CommandBase {
+    private static final DecimalFormat dformat = new DecimalFormat("0.00");
+
     @Override
     public int getRequiredPermissionLevel() {
         return 0;
@@ -97,7 +100,7 @@ public class TotemCommand extends CommandBase {
                 break;
             case "trace":
                 if(args.length == 1) {
-                    messenger.send("There are currently " + Main.sessionDrops.size() + " stats available.");
+                    messenger.send("There are currently " + Main.sessionDrops.size() + (Main.sessionDrops.size() == 1 ? " stat" : " stats") + " available.");
                     messenger.send("Do /" + getName() + " trace list to see all of them in brief context.");
                     messenger.send("Or do /" + getName() + " trace <index> to see the specific of that stat.");
                     return;
@@ -150,7 +153,7 @@ public class TotemCommand extends CommandBase {
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
                         "Total drops: Item " + itemDrops + ", Ingredients " + ingDrops +
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
-                                "§rItem Rate: " + itemRate + " §7(Mobs/item)" + "\n" +
-                                "§rIngredient Rate: " + ingRate + " §7(Mobs/Ingredient)" : ""));
+                                "§rItem Rate: " + dformat.format(itemRate) + " §7(Mobs/item)" + "\n" +
+                                "§rIngredient Rate: " + dformat.format(ingRate) + " §7(Mobs/Ingredient)" : ""));
     }
 }
