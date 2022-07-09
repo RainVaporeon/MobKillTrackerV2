@@ -108,12 +108,24 @@ public class TotemCommand extends CommandBase {
                 }
                 if(args[1].toLowerCase(Locale.ROOT).equals("list")) {
                     messenger.send("- - - Current Session Caches - - -");
+                    int kills = 0;
+                    int items = 0;
+                    int ingredients = 0;
                     for(int i=0; i < Main.sessionDrops.size(); i++) {
                         final DropStatistics tmp = Main.sessionDrops.get(i);
-                        messenger.send("Cache #" + i+1 + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)");
+                        final double iAvg = (tmp.getTotal(1) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(1));
+                        final double inAvg = (tmp.getTotal(2) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(2));
+                        messenger.send("Cache #" + (i+1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? "§c(§7" + dformat.format(iAvg) + ":" + dformat.format(inAvg) + "§7)" : ""));
                         if(tmp.hasNote()) {
                             messenger.send("§7Notes of this data: " + tmp.getNote());
                         }
+                        kills+=tmp.getKills();
+                        items+=tmp.getTotal(1);
+                        ingredients+=tmp.getTotal(2);
+                    }
+                    if(Main.logAdvanced) {
+                        final double divisor = Main.sessionDrops.size();
+                        messenger.send("Stats (Avg.): Kills: " + kills + " (" + dformat.format(kills / divisor) + "), Items: " + items + "(" + dformat.format(items / divisor) + "), Ingredients: " + ingredients + "(" + dformat.format(ingredients / divisor) + ")");
                     }
                     return;
                 }
@@ -133,6 +145,7 @@ public class TotemCommand extends CommandBase {
             case "note":
                 if(args.length == 1) {
                     messenger.send("/" + getName() + " note all [note] - Sets all drop data with the note.");
+                    messenger.send("/" + getName() + " note last [note] - Sets last drop data with the note.");
                     messenger.send("/" + getName() + " note # [note] - Sets specified drop data with this note.");
                     messenger.send("If note was left empty, the notes are cleared.");
                     return;
@@ -141,21 +154,29 @@ public class TotemCommand extends CommandBase {
                 if(args.length >= 3) {
                     note = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
                 } else note = "";
-                if ("all".equals(args[1].toLowerCase(Locale.ROOT))) {
-                    messenger.send("Attaching note...");
-                    for (DropStatistics drops : Main.sessionDrops) {
-                        drops.setNote(note);
-                    }
-                    messenger.send("Finished!");
-                } else {
-                    try {
-                        idx = Integer.parseInt(args[1])-1;
-                        Main.sessionDrops.get(idx).setNote(note);
-                        messenger.send("Successfully attached note " + note + " to data #" + idx+1);
-                    } catch (NumberFormatException|IndexOutOfBoundsException ex) {
-                        messenger.send("Invalid operation.");
-                        return;
-                    }
+                switch (args[1].toLowerCase(Locale.ROOT)) {
+                    case "all":
+                        messenger.send("Attaching note...");
+                        for (DropStatistics drops : Main.sessionDrops) {
+                            drops.setNote(note);
+                        }
+                        messenger.send("Finished!");
+                        break;
+                    case "last":
+                        messenger.send("Attaching note...");
+                        Main.sessionDrops.get(Main.sessionDrops.size()-1).setNote(note);
+                        messenger.send("Finished!");
+                        break;
+                    default:
+                        try {
+                            idx = Integer.parseInt(args[1]) - 1;
+                            Main.sessionDrops.get(idx).setNote(note);
+                            messenger.send("Successfully attached note " + note + " to data #" + idx + 1);
+                        } catch (NumberFormatException | IndexOutOfBoundsException ex) {
+                            messenger.send("Invalid operation.");
+                            return;
+                        }
+                        break;
                 }
                 break;
             case "export":
