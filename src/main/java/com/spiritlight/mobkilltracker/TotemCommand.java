@@ -119,7 +119,7 @@ public class TotemCommand extends CommandBase {
                             final DropStatistics tmp = Main.sessionDrops.get(i);
                             final double iAvg = (tmp.getTotal(1) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(1));
                             final double inAvg = (tmp.getTotal(2) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(2));
-                            messenger.send("Cache #" + (i + 1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? "§c(§7" + dformat.format(iAvg) + ":" + dformat.format(inAvg) + "§7)" : ""));
+                            messenger.send("Cache #" + (i + 1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? " §c(§7" + dformat.format(iAvg) + ":" + dformat.format(inAvg) + "§c)" : ""));
                             if (tmp.hasNote()) {
                                 messenger.send("§7Notes of this data: " + tmp.getNote());
                             }
@@ -129,7 +129,7 @@ public class TotemCommand extends CommandBase {
                         }
                         if (Main.logAdvanced) {
                             final double divisor = Main.sessionDrops.size();
-                            messenger.send("Stats (Avg.): Kills: " + kills + " (" + dformat.format(kills / divisor) + "), Items: " + items + "(" + dformat.format(items / divisor) + "), Ingredients: " + ingredients + "(" + dformat.format(ingredients / divisor) + ")");
+                            messenger.send("Stats (Avg.): Kills: " + kills + " (" + dformat.format(kills / divisor) + "), Items: " + items + " (" + dformat.format(items / divisor) + "), Ingredients: " + ingredients + " (" + dformat.format(ingredients / divisor) + ")");
                         }
                         return;
                     case "delete":
