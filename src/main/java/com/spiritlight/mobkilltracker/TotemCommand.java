@@ -104,43 +104,72 @@ public class TotemCommand extends CommandBase {
                     messenger.send("There are currently " + Main.sessionDrops.size() + (Main.sessionDrops.size() == 1 ? " stat" : " stats") + " available.");
                     messenger.send("Do /" + getName() + " trace list to see all of them in brief context.");
                     messenger.send("Or do /" + getName() + " trace <index> to see the specific of that stat.");
-                    return;
-                }
-                if(args[1].toLowerCase(Locale.ROOT).equals("list")) {
-                    messenger.send("- - - Current Session Caches - - -");
-                    int kills = 0;
-                    int items = 0;
-                    int ingredients = 0;
-                    for(int i=0; i < Main.sessionDrops.size(); i++) {
-                        final DropStatistics tmp = Main.sessionDrops.get(i);
-                        final double iAvg = (tmp.getTotal(1) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(1));
-                        final double inAvg = (tmp.getTotal(2) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(2));
-                        messenger.send("Cache #" + (i+1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? "§c(§7" + dformat.format(iAvg) + ":" + dformat.format(inAvg) + "§7)" : ""));
-                        if(tmp.hasNote()) {
-                            messenger.send("§7Notes of this data: " + tmp.getNote());
-                        }
-                        kills+=tmp.getKills();
-                        items+=tmp.getTotal(1);
-                        ingredients+=tmp.getTotal(2);
-                    }
-                    if(Main.logAdvanced) {
-                        final double divisor = Main.sessionDrops.size();
-                        messenger.send("Stats (Avg.): Kills: " + kills + " (" + dformat.format(kills / divisor) + "), Items: " + items + "(" + dformat.format(items / divisor) + "), Ingredients: " + ingredients + "(" + dformat.format(ingredients / divisor) + ")");
-                    }
+                    messenger.send("Do /" + getName() + " trace delete <index> to delete that specific index.");
+                    messenger.send("Additionally you can do /" + getName() + " trace delete all to wipe them.");
                     return;
                 }
                 int idx;
-                try {
-                    idx = Integer.parseInt(args[1])-1;
-                } catch (NumberFormatException ex) {
-                    messenger.send("Invalid index.");
-                    return;
+                int kills = 0;
+                int items = 0;
+                int ingredients = 0;
+                switch (args[1].toLowerCase(Locale.ROOT)) {
+                    case "list":
+                        messenger.send("- - - Current Session Caches - - -");
+                        for (int i = 0; i < Main.sessionDrops.size(); i++) {
+                            final DropStatistics tmp = Main.sessionDrops.get(i);
+                            final double iAvg = (tmp.getTotal(1) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(1));
+                            final double inAvg = (tmp.getTotal(2) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(2));
+                            messenger.send("Cache #" + (i + 1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? "§c(§7" + dformat.format(iAvg) + ":" + dformat.format(inAvg) + "§7)" : ""));
+                            if (tmp.hasNote()) {
+                                messenger.send("§7Notes of this data: " + tmp.getNote());
+                            }
+                            kills += tmp.getKills();
+                            items += tmp.getTotal(1);
+                            ingredients += tmp.getTotal(2);
+                        }
+                        if (Main.logAdvanced) {
+                            final double divisor = Main.sessionDrops.size();
+                            messenger.send("Stats (Avg.): Kills: " + kills + " (" + dformat.format(kills / divisor) + "), Items: " + items + "(" + dformat.format(items / divisor) + "), Ingredients: " + ingredients + "(" + dformat.format(ingredients / divisor) + ")");
+                        }
+                        return;
+                    case "delete":
+                        if(args.length == 2) {
+                            messenger.send("Invalid input. Try /" + getName() + " trace for more info.");
+                            return;
+                        }
+                        if(args[2].toLowerCase(Locale.ROOT).equals("all")) {
+                            messenger.send("Cleared ALL session data!");
+                            Main.sessionDrops.clear();
+                        } else {
+                            try {
+                                idx = Integer.parseInt(args[2])-1;
+                            } catch (NumberFormatException ex) {
+                                messenger.send("Invalid index.");
+                                return;
+                            }
+                            if(idx < 0 || idx >= Main.sessionDrops.size()) {
+                                messenger.send("Invalid index.");
+                                return;
+                            }
+                            Main.sessionDrops.remove(idx);
+                            messenger.send("Successfully removed index #" + idx+1 + "!");
+                        }
+                        return;
+                    default:
+
+                        try {
+                            idx = Integer.parseInt(args[1])-1;
+                        } catch (NumberFormatException ex) {
+                            messenger.send("Invalid index.");
+                            return;
+                        }
+                        if(idx > Main.sessionDrops.size() || idx < 0) {
+                            messenger.send("Index illegal. Max index allowed: " + Main.sessionDrops.size());
+                            return;
+                        }
+                        summary(Main.sessionDrops.get(idx));
                 }
-                if(idx > Main.sessionDrops.size() || idx < 0) {
-                    messenger.send("Index illegal. Max index allowed: " + Main.sessionDrops.size());
-                    return;
-                }
-                summary(Main.sessionDrops.get(idx));
+
                 break;
             case "note":
                 if(args.length == 1) {
