@@ -11,7 +11,7 @@ Tracks totem stats for mythic farms
 Everything's automated, timer starts when a totem placement is detected; stops when exactly 5 minutes has passed (due to totem expiration message will not always appear)
 
 ## Commands
-Normal command is /mkt. Here are the available commands:
+Normal command is /mkt. Here are the available commands (More in the mod!):
 - start [time]: Starts logging for a specified amount of time, default 30s.
 - stop: Terminates current logging and dump summary
 - advanced: Shows detailed info (Item/ingredient rates)
@@ -21,7 +21,7 @@ Normal command is /mkt. Here are the available commands:
 You may see the API calls in API.java; the mod calls for data exactly 5 times per session (and extra 5 every time you recollect API)
 
 ## Debug commands
-Command is always /mkt-debug (or /mktd for short)
+Command is always /mkt-debug (or /mktd for short) (Only use if you know what you are doing!!! Log spammy!!!)
 
 Commands are as follows:
 
