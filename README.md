@@ -6,6 +6,7 @@ Tracks totem stats for mythic farms
 - Automatically collects data in totem (Kills, item drops, etc)
 - Commands that allow you to trace to any previous saved data (Within session)
 - Hotkey (Default M) to allow you to start recording kills/drops in a specified time range.
+- A "cleaner" option in case you have other players cleaning for you.
 
 ## Usage
 Everything's automated, timer starts when a totem placement is detected; stops when exactly 5 minutes has passed (due to totem expiration message will not always appear)
