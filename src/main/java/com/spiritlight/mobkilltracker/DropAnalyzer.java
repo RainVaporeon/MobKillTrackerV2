@@ -19,6 +19,10 @@ public class DropAnalyzer {
     private static JsonElement cached_element = null;
     private static final Random RANDOM = new Random();
 
+    /**
+     * Utility method to export the provided {@link DropStatistics} into a JSON.
+     * @param dropList The list of {@link DropStatistics} to process.
+     */
     public static void exportDrops(@Nonnull List<DropStatistics> dropList) {
         final AnnouncerSpirit messenger = new AnnouncerSpirit();
         messenger.send("Exporting " + dropList.size() + (dropList.size() == 1 ? " entry..." : " entries..."));
@@ -38,13 +42,15 @@ public class DropAnalyzer {
             object.addProperty("ingredient_t0", drops.getT0Ingredients());
             object.addProperty("kills", drops.getKills());
             object.addProperty("note", drops.getNote());
+
+            // object.addProperty("rarity_index", getRarityIndex(drops));
             array.add(object);
         }
         cached_element = array;
         messenger.send(new TextComponentString("Successfully exported, click here to copy. (Only copies latest)")
                 .setStyle(new Style().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mkt __$copy.clipboard"))));
         messenger.send("Alternatively, check your logs for exported JSON. (This set of numbers may help you find it quickier: "
-                + RANDOM.nextInt());
+                + RANDOM.nextInt() + ")");
         System.out.println(array);
     }
 
@@ -53,5 +59,15 @@ public class DropAnalyzer {
         StringSelection stringSelection = new StringSelection(cached_element.toString());
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
+    }
+
+    protected static int getRarityIndex(DropStatistics drops) {
+        return drops.getMythicDropped() * 512
+                + drops.getFabledDropped() * 64
+                + drops.getLegendaryDropped() * 16
+                + drops.getRareDropped() * 4
+                + drops.getSetDropped() * 6
+                + drops.getUniqueDropped() * 2
+                + drops.getNormalDropped();
     }
 }

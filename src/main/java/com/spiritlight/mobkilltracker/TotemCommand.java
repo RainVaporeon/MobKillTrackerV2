@@ -12,7 +12,7 @@ import java.util.*;
 
 @ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
 public class TotemCommand extends CommandBase {
-    private static final DecimalFormat dformat = new DecimalFormat("0.00");
+    private static final DecimalFormat dFormat = new DecimalFormat("0.00");
 
     @Override
     public int getRequiredPermissionLevel() {
@@ -119,7 +119,7 @@ public class TotemCommand extends CommandBase {
                             final DropStatistics tmp = Main.sessionDrops.get(i);
                             final double iAvg = (tmp.getTotal(1) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(1));
                             final double inAvg = (tmp.getTotal(2) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(2));
-                            messenger.send("Cache #" + (i + 1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? " §c(§7" + dformat.format(iAvg) + ":" + dformat.format(inAvg) + "§c)" : ""));
+                            messenger.send("Cache #" + (i + 1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? " §c(§7" + dFormat.format(iAvg) + ":" + dFormat.format(inAvg) + "§c)" : ""));
                             if (tmp.hasNote()) {
                                 messenger.send("§7Notes of this data: " + tmp.getNote());
                             }
@@ -129,7 +129,7 @@ public class TotemCommand extends CommandBase {
                         }
                         if (Main.logAdvanced) {
                             final double divisor = Main.sessionDrops.size();
-                            messenger.send("Stats (Avg.): Kills: " + kills + " (" + dformat.format(kills / divisor) + "), Items: " + items + " (" + dformat.format(items / divisor) + "), Ingredients: " + ingredients + " (" + dformat.format(ingredients / divisor) + ")");
+                            messenger.send("Stats (Avg.): Kills: " + kills + " (" + dFormat.format(kills / divisor) + "), Items: " + items + " (" + dFormat.format(items / divisor) + "), Ingredients: " + ingredients + " (" + dFormat.format(ingredients / divisor) + ")");
                         }
                         return;
                     case "delete":
@@ -152,7 +152,7 @@ public class TotemCommand extends CommandBase {
                                 return;
                             }
                             Main.sessionDrops.remove(idx);
-                            messenger.send("Successfully removed index #" + idx+1 + "!");
+                            messenger.send("Successfully removed index #" + (idx+1) + "!");
                         }
                         return;
                     default:
@@ -310,7 +310,8 @@ public class TotemCommand extends CommandBase {
                         "§rNormal §rDrops: " + drops.getNormalDropped() + "\n" +
                         "Total drops: Item " + itemDrops + ", Ingredients " + ingDrops +
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
-                                "§rItem Rate: " + dformat.format(itemRate) + " §7(Mobs/item)" + "\n" +
-                                "§rIngredient Rate: " + dformat.format(ingRate) + " §7(Mobs/Ingredient)" : ""));
+                                "§rItem Rate: " + dFormat.format(itemRate) + " §7(Mobs/item)" + "\n" +
+                                "§rIngredient Rate: " + dFormat.format(ingRate) + " §7(Mobs/Ingredient)" + "\n" +
+                                "§rRarity Index: " + DropAnalyzer.getRarityIndex(drops) : ""));
     }
 }
