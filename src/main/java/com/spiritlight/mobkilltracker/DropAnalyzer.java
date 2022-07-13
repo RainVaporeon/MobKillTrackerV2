@@ -61,13 +61,13 @@ public class DropAnalyzer {
         clipboard.setContents(stringSelection, null);
     }
 
-    protected static int getRarityIndex(DropStatistics drops) {
-        return drops.getMythicDropped() * 512
+    protected static float getRarityIndex(DropStatistics drops) {
+        return (float)(drops.getMythicDropped() * 512
                 + drops.getFabledDropped() * 64
                 + drops.getLegendaryDropped() * 16
                 + drops.getRareDropped() * 4
                 + drops.getSetDropped() * 6
                 + drops.getUniqueDropped() * 2
-                + drops.getNormalDropped();
+                + drops.getNormalDropped())/drops.getTotal(1);
     }
 }
