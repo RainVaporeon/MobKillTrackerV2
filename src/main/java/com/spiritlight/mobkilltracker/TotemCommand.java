@@ -200,7 +200,7 @@ public class TotemCommand extends CommandBase {
                         try {
                             idx = Integer.parseInt(args[1]) - 1;
                             Main.sessionDrops.get(idx).setNote(note);
-                            messenger.send("Successfully attached note " + note + " to data #" + idx + 1);
+                            messenger.send("Successfully attached note " + note + " to data #" + (idx + 1));
                         } catch (NumberFormatException | IndexOutOfBoundsException ex) {
                             messenger.send("Invalid operation.");
                             return;
