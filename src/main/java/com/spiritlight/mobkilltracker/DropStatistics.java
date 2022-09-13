@@ -241,4 +241,14 @@ public class DropStatistics {
             default:
         }
     }
+
+     public float getRarityIndex() {
+        return (float)(this.getMythicDropped() * 512
+                + this.getFabledDropped() * 64
+                + this.getLegendaryDropped() * 16
+                + this.getRareDropped() * 4
+                + this.getSetDropped() * 6
+                + this.getUniqueDropped() * 2
+                + this.getNormalDropped())/this.getTotal(1);
+    }
 }

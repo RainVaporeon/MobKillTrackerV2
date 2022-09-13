@@ -119,7 +119,7 @@ public class TotemCommand extends CommandBase {
                             final DropStatistics tmp = Main.sessionDrops.get(i);
                             final double iAvg = (tmp.getTotal(1) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(1));
                             final double inAvg = (tmp.getTotal(2) <= 0 ? 0 : (double) tmp.getKills() / tmp.getTotal(2));
-                            messenger.send("Cache #" + (i + 1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? " §c(§7" + dFormat.format(iAvg) + ":" + dFormat.format(inAvg) + "§c)" : ""));
+                            messenger.send("Cache #" + (i + 1) + ": §r" + tmp.getKills() + "§a kills; §r" + tmp.getTotal(0) + "§a drops §7(§r" + tmp.getTotal(1) + "§7 items, §r" + tmp.getTotal(2) + "§7 ingredients)" + (Main.logAdvanced ? " §c(§7" + dFormat.format(iAvg) + ":" + dFormat.format(inAvg) + "§c)" + " " + tmp.getRarityIndex() : ""));
                             if (tmp.hasNote()) {
                                 messenger.send("§7Notes of this data: " + tmp.getNote());
                             }
@@ -137,22 +137,29 @@ public class TotemCommand extends CommandBase {
                             messenger.send("Invalid input. Try /" + getName() + " trace for more info.");
                             return;
                         }
-                        if(args[2].toLowerCase(Locale.ROOT).equals("all")) {
-                            messenger.send("Cleared ALL session data!");
-                            Main.sessionDrops.clear();
-                        } else {
-                            try {
-                                idx = Integer.parseInt(args[2])-1;
-                            } catch (NumberFormatException ex) {
-                                messenger.send("Invalid index.");
+                        switch (args[2].toLowerCase(Locale.ROOT)) {
+                            case "all":
+                                messenger.send("Cleared ALL session data!");
+                                Main.sessionDrops.clear();
+                                break;
+                            case "last":
+                                messenger.send("Deleted last session data!");
+                                Main.sessionDrops.remove(Main.sessionDrops.size()-1);
                                 return;
-                            }
-                            if(idx < 0 || idx >= Main.sessionDrops.size()) {
-                                messenger.send("Invalid index.");
-                                return;
-                            }
-                            Main.sessionDrops.remove(idx);
-                            messenger.send("Successfully removed index #" + (idx+1) + "!");
+                            default:
+                                try {
+                                    idx = Integer.parseInt(args[2]) - 1;
+                                } catch (NumberFormatException ex) {
+                                    messenger.send("Invalid index.");
+                                    return;
+                                }
+                                if (idx < 0 || idx >= Main.sessionDrops.size()) {
+                                    messenger.send("Invalid index.");
+                                    return;
+                                }
+                                Main.sessionDrops.remove(idx);
+                                messenger.send("Successfully removed index #" + (idx + 1) + "!");
+                                break;
                         }
                         return;
                     default:
@@ -169,7 +176,6 @@ public class TotemCommand extends CommandBase {
                         }
                         summary(Main.sessionDrops.get(idx));
                 }
-
                 break;
             case "note":
                 if(args.length == 1) {
@@ -312,6 +318,6 @@ public class TotemCommand extends CommandBase {
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
                                 "§rItem Rate: " + dFormat.format(itemRate) + " §7(Mobs/item)" + "\n" +
                                 "§rIngredient Rate: " + dFormat.format(ingRate) + " §7(Mobs/Ingredient)" + "\n" +
-                                "§rRarity Index: " + DropAnalyzer.getRarityIndex(drops) : ""));
+                                "§rRarity Index: " + drops.getRarityIndex() : ""));
     }
 }

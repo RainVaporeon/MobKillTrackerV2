@@ -17,7 +17,7 @@ public class Main
 {
     public static final String MODID = "mkt";
     public static final String NAME = "MobKillTracker v2";
-    public static final String VERSION = "1.3";
+    public static final String VERSION = "1.5";
     // Lists are all Name:Tier
 
     protected static DropStatistics cachedDrops = new DropStatistics();

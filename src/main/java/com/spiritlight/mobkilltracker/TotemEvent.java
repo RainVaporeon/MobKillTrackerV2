@@ -107,7 +107,7 @@ public class TotemEvent {
                         (Main.logAdvanced ? "\n §c§lAdvanced details:\n" +
                                 "§rItem Rate: " + dFormat.format(itemRate) + " §7(Mobs/item)" + "\n" +
                                 "§rIngredient Rate: " + dFormat.format(ingRate) + " §7(Mobs/Ingredient)" + "\n" +
-                                "§rRarity Index: " + DropAnalyzer.getRarityIndex(drops) : "")
+                                "§rRarity Index: " + drops.getRarityIndex() : "")
         );
         entityEvent.UUIDMap.clear(); // Releasing resources
         Main.cachedDrops = new DropStatistics(drops);

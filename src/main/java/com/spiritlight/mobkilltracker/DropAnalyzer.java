@@ -42,7 +42,6 @@ public class DropAnalyzer {
             object.addProperty("ingredient_t0", drops.getT0Ingredients());
             object.addProperty("kills", drops.getKills());
             object.addProperty("note", drops.getNote());
-
             // object.addProperty("rarity_index", getRarityIndex(drops));
             array.add(object);
         }
@@ -59,15 +58,5 @@ public class DropAnalyzer {
         StringSelection stringSelection = new StringSelection(cached_element.toString());
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
-    }
-
-    protected static float getRarityIndex(DropStatistics drops) {
-        return (float)(drops.getMythicDropped() * 512
-                + drops.getFabledDropped() * 64
-                + drops.getLegendaryDropped() * 16
-                + drops.getRareDropped() * 4
-                + drops.getSetDropped() * 6
-                + drops.getUniqueDropped() * 2
-                + drops.getNormalDropped())/drops.getTotal(1);
     }
 }
