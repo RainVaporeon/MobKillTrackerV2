@@ -8,6 +8,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +42,16 @@ public class Main
         } catch (IOException e) {
             e.printStackTrace();
         }
-        API.fetchItem();
+        boolean connected = false;
+        try {
+            URL url = new URL("8.8.8.8");
+            URLConnection connection = url.openConnection();
+            connection.connect();
+            connected = true;
+        } catch (IOException ignored) {
+        }
+        if(connected)
+            API.fetchItem();
         ClientCommandHandler.instance.registerCommand(new DebugCommand());
         ClientCommandHandler.instance.registerCommand(new TotemCommand());
         MinecraftForge.EVENT_BUS.register(new entityEvent());

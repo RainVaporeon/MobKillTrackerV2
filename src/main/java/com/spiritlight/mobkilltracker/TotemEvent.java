@@ -55,7 +55,7 @@ public class TotemEvent {
                 }
                 scheduler.schedule(summary, duration, TimeUnit.SECONDS);
             } catch (RejectedExecutionException ex) {
-                new AnnouncerSpirit().send("Error: The responsible thread is not available right now. Please try again later.");
+                messenger.send("Error: The responsible thread is not available right now. Please try again later.");
                 instanceOccupied.set(false);
             }
         } else {

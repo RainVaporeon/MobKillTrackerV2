@@ -36,11 +36,9 @@ public class entityEvent {
         CompletableFuture.runAsync(() -> {
             STATUS.set(true);
             final List<Entity> entityList = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
+            entityList.removeIf(e -> e.getName().equals("item.item.emerald") || e instanceof EntityArmorStand);
             final AnnouncerSpirit messenger = new AnnouncerSpirit();
             for (Entity e : entityList) {
-                if (!(e instanceof EntityArmorStand)) {
-                    continue;
-                }
                 final UUID entityUUID = e.getUniqueID();
                 String mobOrItemName = (e.hasCustomName() ? e.getCustomNameTag() : e.getName());
                 if (UUIDMap.containsKey(e.getUniqueID()) && UUIDMap.get(e.getUniqueID()).equals(mobOrItemName))
@@ -82,8 +80,8 @@ public class entityEvent {
             final AnnouncerSpirit messenger = new AnnouncerSpirit();
             ITEMSTATUS.set(true);
             final List<Entity> worldEntity = new ArrayList<>(Minecraft.getMinecraft().world.getLoadedEntityList());
+            worldEntity.removeIf(e -> e.getName().equals("item.item.emerald") || !(e instanceof EntityItem));
             for (Entity e : worldEntity) {
-                if (!(e instanceof EntityItem)) continue;
                 if (e.getName().contains("NPC")) continue;
                 if (e.serializeNBT().hasKey("NoGravity", 1)) continue;
                 NBTTagCompound nbt = e.serializeNBT();

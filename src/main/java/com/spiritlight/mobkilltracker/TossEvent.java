@@ -41,6 +41,7 @@ public class TossEvent {
         if (!TotemEvent.drops.doAllowUpdates()) return;
         final Entity e = event.getEntity();
         if (!(e instanceof EntityItem)) return;
+        if(e.getName().equals("item.item.emerald")) return;
         if (e.getName().contains("NPC")) return;
         if (e.serializeNBT().hasKey("NoGravity", 1)) return;
         NBTTagCompound nbt = e.serializeNBT();
