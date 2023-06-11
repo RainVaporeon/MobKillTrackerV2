@@ -1,6 +1,10 @@
 # MobKillTrackerV2
 Tracks totem stats for mythic farms
 
+# Deprecated Version
+
+Please go to [this repository](https://github.com/RainVaporeon/MobKillTrackerv3) for the latest version. It has fixed various bugs and is generally more optimized.
+
 ## Features
 
 - Automatically collects data in totem (Kills, item drops, etc)
